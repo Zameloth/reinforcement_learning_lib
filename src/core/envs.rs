@@ -2,11 +2,17 @@ pub trait MonteCarloEnvironment {
     fn reset(&mut self); // renvoie l’état initial
     fn step(&mut self, action: usize); // (next_state, reward, done)
     fn score(&self) -> f64;
+    fn is_game_over(&self) -> bool;
     fn num_states(&self) -> usize;
     fn num_actions(&self) -> usize;
-    fn is_game_over(&self) -> bool;
     //fn render(&self);
 }
+
+pub trait Environment {
+    fn num_states(&self) -> usize;
+    fn num_actions(&self) -> usize;
+}
+
 
 /// Permet de représenter un environnement pour l'utiliser avec les fontions de dynamic programming
 #[derive(Debug)]
@@ -26,6 +32,24 @@ pub struct DPEnvironment {
     pub num_actions: usize,
     pub num_rewards: usize,
 }
+
+impl Environment for DPEnvironment {
+    fn num_states(&self) -> usize {
+        self.num_states
+    }
+    fn num_actions(&self) -> usize {
+        self.num_actions
+    }
+}
+
+// impl Environment for MonteCarloEnvironment {
+//     fn num_states(&self) -> usize {
+//         self.num_states
+//     }
+//     fn num_actions(&self) -> usize {
+//         self.num_actions
+//     }
+// }
 
 impl DPEnvironment {
     /// Constructeur statique pour initialiser l'environnement avec des transitions nulles
