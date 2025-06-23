@@ -6,3 +6,11 @@ edition = "2021"
 [[bin]]
 name = "main"
 path = "src/experiments/main.rs"
+
+[[bin]]
+name = "test_secret_envs"
+path = "src/environments/secret_envs.rs"
+
+[dependencies]
+rand = "0.9.1"
+libloading = "0.8.8"
