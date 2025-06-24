@@ -16,10 +16,10 @@ pub struct ProbabilisticPolicy {
 }
 
 impl ProbabilisticPolicy {
-    pub fn new<E: Environment>(env: E) -> Self {
+    pub fn new<E: Environment>(env: &E) -> Self {
         Self {
             policy_table: vec![
-                (1 / env.num_actions()) as f64;
+                1.0 / env.num_actions() as f64;
                 env.num_states() * env.num_actions()
             ],
             num_states: env.num_states(),
