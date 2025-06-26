@@ -12,7 +12,7 @@ impl envs::MonteCarloEnvironment for LineWorld {
     }
 
     fn step(&mut self, action: usize) {
-        assert!(action >= 0 && action < self.num_actions());
+        assert!(action < self.num_actions());
         assert!(!self.is_game_over());
 
         match action {
@@ -61,8 +61,8 @@ pub fn line_world_dp() -> DPEnvironment {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::panic::{catch_unwind, AssertUnwindSafe};
     use crate::core::envs::MonteCarloEnvironment;
+    use std::panic::{catch_unwind, AssertUnwindSafe};
 
     #[test]
     fn test_line_world_monte_carlo_initial_state() {
