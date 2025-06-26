@@ -1,8 +1,7 @@
-use crate::core::envs::{DPEnvironment, Environment, MonteCarloEnvironment};
+use crate::core::envs::Environment;
 use rand;
-use std::collections::HashMap;
-use std::fmt::{write, Display, Formatter, Pointer};
 use rand::random_range;
+use std::fmt::{Display, Formatter, Pointer};
 
 /// Interface générale pour les policies
 pub trait Policy {
@@ -10,8 +9,6 @@ pub trait Policy {
 
     fn get_proba(&self, state: usize, action: usize) -> f64;
 }
-
-//Todo: implementer la policy deterministe
 
 pub struct ProbabilisticPolicy {
     pub policy_table: Vec<f64>,

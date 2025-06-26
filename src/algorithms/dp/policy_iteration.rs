@@ -1,5 +1,5 @@
 use crate::core::envs::DPEnvironment;
-use crate::core::policies::{DeterministicPolicy, Policy, ProbabilisticPolicy};
+use crate::core::policies::{DeterministicPolicy, Policy};
 
 pub fn policy_evaluation(
     env: &DPEnvironment,
