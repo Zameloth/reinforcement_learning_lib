@@ -1,6 +1,8 @@
 use crate::core::envs::{DPEnvironment, Environment, MonteCarloEnvironment};
 use rand;
 use std::collections::HashMap;
+use std::fmt::{write, Display, Formatter, Pointer};
+use rand::random_range;
 
 /// Interface générale pour les policies
 pub trait Policy {
@@ -9,14 +11,46 @@ pub trait Policy {
     fn get_proba(&self, state: usize, action: usize) -> f64;
 }
 
+//Todo: implementer la policy deterministe
+
 pub struct ProbabilisticPolicy {
     pub policy_table: Vec<f64>,
     num_states: usize,
     num_actions: usize,
 }
 
+pub struct DeterministicPolicy {
+    pub policy_table: Vec<usize>,
+    num_states: usize,
+    num_actions: usize,
+}
+
+impl Display for DeterministicPolicy {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "DeterministicPolicy : {:?}", self.policy_table)
+    }
+}
+
+impl DeterministicPolicy {
+    pub fn new_det_pol<E: Environment>(env: &E) -> Self {
+        Self {
+            policy_table: vec![random_range(0..env.num_actions()); env.num_states()],
+            num_states: env.num_states(),
+            num_actions: env.num_actions(),
+        }
+    }
+    
+    pub fn set_action(&mut self, state: &usize, action: usize) {
+        self.policy_table[*state] = action;
+    }
+    
+    pub fn get_action(&self, state: &usize) -> usize {
+        self.policy_table[*state]
+    }
+}
+
 impl ProbabilisticPolicy {
-    pub fn new<E: Environment>(env: &E) -> Self {
+    pub fn new_pb_pol<E: Environment>(env: &E) -> Self {
         Self {
             policy_table: vec![
                 1.0 / env.num_actions() as f64;
@@ -27,12 +61,6 @@ impl ProbabilisticPolicy {
         }
     }
 
-    // pub fn new(env: MonteCarloEnvironment) -> Self {
-    //
-    // }
-}
-
-impl Policy for ProbabilisticPolicy {
     fn set_proba(&mut self, state: usize, action: usize, proba: f64) {
         self.policy_table[state * self.num_actions + action] = proba;
     }
@@ -40,4 +68,20 @@ impl Policy for ProbabilisticPolicy {
     fn get_proba(&self, state: usize, action: usize) -> f64 {
         self.policy_table[state * self.num_actions + action]
     }
+    
+    pub fn get_probs_from_state(&self, state: &usize) -> Vec<f64> {
+        let mut probs: Vec<f64> = vec![0.0; self.num_actions];
+        for action in 0..self.num_actions {
+            probs.insert(action, self.get_proba(*state, action));
+        }
+        probs
+    }
+
+    // pub fn new_pb_pol_MC(env: MonteCarloEnvironment) -> Self {
+    //
+    // }
 }
+
+// impl Policy for ProbabilisticPolicy {
+//  
+// }
