@@ -1,6 +1,5 @@
 use crate::core::envs::Environment;
 use rand;
-use rand::random_range;
 use std::fmt::{Display, Formatter};
 
 /// Interface générale pour les policies
@@ -31,7 +30,7 @@ impl Display for DeterministicPolicy {
 impl DeterministicPolicy {
     pub fn new_det_pol<E: Environment>(env: &E) -> Self {
         Self {
-            policy_table: vec![random_range(0..env.num_actions()); env.num_states()],
+            policy_table: vec![rand::random_range(0..env.num_actions()); env.num_states()],
             num_states: env.num_states(),
             num_actions: env.num_actions(),
         }
