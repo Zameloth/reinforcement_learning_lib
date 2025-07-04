@@ -1,4 +1,5 @@
-use crate::core::envs::DPEnvironment;
+use rand::{random_range};
+use crate::core::envs::{DPEnvironment, MonteCarloEnvironment};
 
 /// Actions : 
 ///     Pierre = 0
@@ -56,4 +57,68 @@ fn pierre_feuille_ciseaux_dp() -> DPEnvironment {
         }
     }
     env
+}
+
+struct PierreFeuilleCiseaux {
+    round_number: usize,
+    last_action: usize,
+    adv_action: usize,
+}
+
+impl MonteCarloEnvironment for PierreFeuilleCiseaux {
+    fn reset(&mut self) {
+        self.round_number=0;
+        self.last_action=0;
+        self.adv_action=0;
+    }
+
+    fn step(&mut self, action: usize) {
+        if ! self.is_game_over(){
+            match self.round_number {
+                0 => {
+                    self.adv_action = random_range(0..3)
+                }
+                1=> self.adv_action = self.last_action,
+                _ => unreachable!()
+            }
+            self.round_number += 1;
+            self.last_action = action;
+        }
+        else {
+            unreachable!()
+        }
+    }
+
+    fn score(&self) -> f64 {
+        match (self.last_action, self.adv_action) {
+            // égalité
+            (0, 0) => 0.0,
+            (1, 1) => 0.0,
+            (2, 2) => 0.0,
+
+            // Perdu
+            (1, 2) => -1.0,
+            (2, 0) => -1.0,
+            (0, 1) => -1.0,
+
+            // Gagné
+            (0, 2) => 1.0,
+            (1, 0) => 1.0,
+            (2, 1) => 1.0,
+
+            _ => unreachable!()
+        }
+    }
+
+    fn is_game_over(&self) -> bool {
+        self.round_number >= 2
+    }
+
+    fn num_states(&self) -> usize {
+        13
+    }
+
+    fn num_actions(&self) -> usize {
+        3
+    }
 }
