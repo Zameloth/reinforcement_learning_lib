@@ -1,5 +1,5 @@
-mod dynamic_programming {
-    use crate::core::envs::DPEnvironment;
+pub mod dynamic_programming {
+    use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment};
 
     pub fn grid_world() -> DPEnvironment {
         let num_states = 25;
@@ -54,10 +54,24 @@ mod dynamic_programming {
     }
 }
 
-use crate::core::envs::MonteCarloEnvironment;
+use crate::core::envs::{Environment, MonteCarloEnvironment};
 
 pub struct GridWorld {
     agent_pos: usize,
+}
+
+impl Environment for GridWorld {
+    fn num_states(&self) -> usize {
+        25
+    }
+
+    fn num_actions(&self) -> usize {
+        4
+    }
+
+    fn num_rewards(&self) -> usize {
+        3
+    }
 }
 
 impl MonteCarloEnvironment for GridWorld {
@@ -116,18 +130,27 @@ impl MonteCarloEnvironment for GridWorld {
         self.agent_pos == 4 || self.agent_pos == 24
     }
 
-    fn num_states(&self) -> usize {
-        24
+    fn display(&self) {
+        todo!()
     }
 
-    fn num_actions(&self) -> usize {
-        4
+    fn start_from_random_state(&mut self) {
+        todo!()
+    }
+
+    fn state_id(&self) -> usize {
+        todo!()
+    }
+
+    fn is_forbidden(&self, action: usize) -> bool {
+        todo!()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::dynamic_programming::grid_world;
+    use crate::core::envs::DynamicProgramingEnvironment;
 
     #[test]
     fn test_grid_world_transitions() {

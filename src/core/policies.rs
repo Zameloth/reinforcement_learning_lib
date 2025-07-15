@@ -1,4 +1,4 @@
-use crate::core::envs::Environment;
+use crate::core::envs::{DynamicProgramingEnvironment, Environment};
 use rand;
 use std::fmt::{Display, Formatter};
 
@@ -28,7 +28,7 @@ impl Display for DeterministicPolicy {
 }
 
 impl DeterministicPolicy {
-    pub fn new_det_pol<E: Environment>(env: &E) -> Self {
+    pub fn new_det_pol(env: &dyn DynamicProgramingEnvironment) -> Self {
         Self {
             policy_table: vec![rand::random_range(0..env.num_actions()); env.num_states()],
             num_states: env.num_states(),

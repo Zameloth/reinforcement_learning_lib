@@ -1,8 +1,8 @@
-use crate::core::envs::{DPEnvironment, Environment};
+use crate::core::envs::{DynamicProgramingEnvironment};
 use crate::core::policies::DeterministicPolicy;
 
 pub fn value_iteration(
-    env: &DPEnvironment,
+    env: &dyn DynamicProgramingEnvironment,
     theta: f64,
     gamma: f64,
 ) -> (DeterministicPolicy, Vec<f64>) {
@@ -17,11 +17,11 @@ pub fn value_iteration(
             let mut max_q = f64::NEG_INFINITY;
             let mut best_a: Option<usize> = None;
 
-            for a in 0..env.num_actions {
+            for a in 0..env.num_actions() {
                 let mut q_s_a = 0.0;
                 for s_prime in 0..env.num_states() {
-                    for r_index in 0..env.num_rewards {
-                        let r = env.rewards[r_index];
+                    for r_index in 0..env.num_rewards() {
+                        let r = env.get_reward(r_index);
                         let p = env.get_transition_prob(s, a, s_prime, r_index);
                         q_s_a += p * (r + gamma * values[s_prime]);
                     }

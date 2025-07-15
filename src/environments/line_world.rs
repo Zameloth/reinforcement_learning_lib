@@ -1,9 +1,23 @@
 use crate::core::envs;
-use crate::core::envs::DPEnvironment;
+use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment};
 
 #[derive(Debug)]
 struct LineWorld {
     agent_pos: usize,
+}
+
+impl Environment for LineWorld {
+    fn num_states(&self) -> usize {
+        5
+    }
+
+    fn num_actions(&self) -> usize {
+        2
+    }
+
+    fn num_rewards(&self) -> usize {
+        3
+    }
 }
 
 impl envs::MonteCarloEnvironment for LineWorld {
@@ -35,12 +49,20 @@ impl envs::MonteCarloEnvironment for LineWorld {
         self.agent_pos == 0 || self.agent_pos == 4
     }
 
-    fn num_states(&self) -> usize {
-        5
+    fn display(&self) {
+        todo!()
     }
 
-    fn num_actions(&self) -> usize {
-        2
+    fn start_from_random_state(&mut self) {
+        todo!()
+    }
+
+    fn state_id(&self) -> usize {
+        todo!()
+    }
+
+    fn is_forbidden(&self, action: usize) -> bool {
+        todo!()
     }
 }
 
@@ -83,7 +105,7 @@ mod tests {
     fn test_line_world_monte_carlo_step_and_terminal() {
         let mut env = LineWorld { agent_pos: 0 };
         env.reset(); // agent_pos = 2
-        
+
         // Un pas vers la gauche
         env.step(0);
         assert_eq!(env.agent_pos, 1);

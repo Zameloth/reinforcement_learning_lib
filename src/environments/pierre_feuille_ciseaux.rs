@@ -1,5 +1,5 @@
 use rand::{random_range};
-use crate::core::envs::{DPEnvironment, MonteCarloEnvironment};
+use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment, MonteCarloEnvironment};
 
 /// Actions : 
 ///     Pierre = 0
@@ -65,6 +65,19 @@ struct PierreFeuilleCiseaux {
     adv_action: usize,
 }
 
+impl Environment for PierreFeuilleCiseaux {
+    fn num_states(&self) -> usize {
+        13
+    }
+
+    fn num_actions(&self) -> usize {
+        3
+    }
+    fn num_rewards(&self) -> usize {
+        3
+    }
+}
+
 impl MonteCarloEnvironment for PierreFeuilleCiseaux {
     fn reset(&mut self) {
         self.round_number=0;
@@ -114,11 +127,21 @@ impl MonteCarloEnvironment for PierreFeuilleCiseaux {
         self.round_number >= 2
     }
 
-    fn num_states(&self) -> usize {
-        13
+
+
+    fn display(&self) {
+        todo!()
     }
 
-    fn num_actions(&self) -> usize {
-        3
+    fn start_from_random_state(&mut self) {
+        todo!()
+    }
+
+    fn state_id(&self) -> usize {
+        todo!()
+    }
+
+    fn is_forbidden(&self, action: usize) -> bool {
+        todo!()
     }
 }
