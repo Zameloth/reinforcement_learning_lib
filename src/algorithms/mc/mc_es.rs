@@ -44,3 +44,13 @@ pub fn monte_carlo_es(
 
     (policy, q)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_monte_carlo_es() {
+        
+    }
+}
