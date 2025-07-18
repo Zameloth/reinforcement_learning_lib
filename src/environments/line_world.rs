@@ -1,3 +1,4 @@
+use rand::random_range;
 use crate::core::envs;
 use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment};
 
@@ -54,7 +55,8 @@ impl envs::MonteCarloEnvironment for LineWorld {
     }
 
     fn start_from_random_state(&mut self) {
-        todo!()
+        self.reset();
+        self.agent_pos = random_range(0..5);
     }
 
     fn state_id(&self) -> usize {
