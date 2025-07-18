@@ -2,8 +2,8 @@ use crate::core::envs;
 use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment};
 
 #[derive(Debug)]
-struct LineWorld {
-    agent_pos: usize,
+pub struct LineWorld {
+    pub agent_pos: usize,
 }
 
 impl Environment for LineWorld {
