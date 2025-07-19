@@ -1,19 +1,25 @@
 use crate::core::envs::{DynamicProgramingEnvironment, Environment};
 use rand;
+use rand::random;
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
-use rand::{random, Rng};
+use std::{fs, io};
+use std::io::Write;
 
 /// Interface générale pour les policies
 pub trait Policy {
     fn get_action(&self, state: &usize) -> usize;
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProbabilisticPolicy {
     pub policy_table: Vec<f64>,
     num_states: usize,
     num_actions: usize,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DeterministicPolicy {
     pub policy_table: Vec<usize>,
     num_states: usize,
@@ -38,7 +44,7 @@ impl DeterministicPolicy {
     pub fn set_action(&mut self, state: &usize, action: usize) {
         self.policy_table[*state] = action;
     }
-    
+
     pub fn get_action(&self, state: &usize) -> usize {
         self.policy_table[*state]
     }
@@ -69,7 +75,6 @@ impl ProbabilisticPolicy {
     fn get_proba(&self, state: usize, action: usize) -> f64 {
         self.policy_table[state * self.num_actions + action]
     }
-    
 }
 
 impl Policy for ProbabilisticPolicy {
@@ -78,17 +83,30 @@ impl Policy for ProbabilisticPolicy {
         for action in 0..self.num_actions {
             probs.insert(action, self.get_proba(*state, action));
         }
-        
+
         assert_eq!(probs.iter().sum::<f64>(), 1.0);
-        
-        let mut rand_num:f64 = random();
+
+        let mut rand_num: f64 = random();
         for (i, prob) in probs.iter().enumerate() {
             rand_num -= prob;
             if rand_num <= 0.0 {
                 return i;
             }
         }
-        
+
         panic!("Error in get_action");
     }
+}
+
+fn save_to_file<T: Serialize>(obj: &T, path: &str) -> io::Result<()> {
+    let json = serde_json::to_string_pretty(obj)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    fs::write(path, json)
+}
+
+fn load_from_file<T: DeserializeOwned>(path: &str) -> io::Result<T> {
+    let json = fs::read_to_string(path)?;
+    let obj = serde_json::from_str(&json)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    Ok(obj)
 }
