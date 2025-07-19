@@ -34,7 +34,7 @@ impl envs::MonteCarloEnvironment for LineWorld {
         self.agent_pos = 2;
     }
 
-    fn step(&mut self, action: usize) {
+    fn step(&mut self, action: usize) -> (usize, f64) {
         assert!(action < self.num_actions());
         assert!(!self.is_game_over());
 
@@ -43,6 +43,8 @@ impl envs::MonteCarloEnvironment for LineWorld {
             1 => self.agent_pos += 1,
             _ => unreachable!(),
         }
+        
+        (self.state_id(), self.score())
     }
 
     fn score(&self) -> f64 {

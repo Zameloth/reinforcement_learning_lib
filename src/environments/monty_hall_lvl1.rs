@@ -114,7 +114,7 @@ impl MonteCarloEnvironment for MontyHallEnv {
         }
     }
 
-    fn step(&mut self, action: usize) {
+    fn step(&mut self, action: usize) -> (usize, f64) {
         if self.portes_disponibles.contains(&action) && self.nb_porte > 2 {
             let old_id       = self.state_id;
             let multiplier   = self.nb_porte;                         // 3 au premier tour
@@ -144,6 +144,8 @@ impl MonteCarloEnvironment for MontyHallEnv {
         } else {
             panic!("Action not allowed");
         }
+
+        (self.state_id, self.score())
     }
 
     fn score(&self) -> f64 {

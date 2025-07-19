@@ -125,7 +125,7 @@ impl MonteCarloEnvironment for SecretEnv {
         }
     }
 
-    fn step(&mut self, action: usize) {
+    fn step(&mut self, action: usize) -> (usize, f64) {
         unsafe {
             let step_fn: libloading::Symbol<unsafe extern "C" fn(*mut c_void, usize)> = self
                 .lib
@@ -134,6 +134,8 @@ impl MonteCarloEnvironment for SecretEnv {
 
             step_fn(self.env, action);
         }
+
+        (self.state_id(), self.get_reward(self.state_id()))
     }
 
     fn score(&self) -> f64 {

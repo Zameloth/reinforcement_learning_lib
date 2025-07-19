@@ -54,8 +54,8 @@ pub mod dynamic_programming {
     }
 }
 
-use rand::random_range;
 use crate::core::envs::{Environment, MonteCarloEnvironment};
+use rand::random_range;
 
 pub struct GridWorld {
     agent_pos: usize,
@@ -80,7 +80,7 @@ impl MonteCarloEnvironment for GridWorld {
         self.agent_pos = 0;
     }
 
-    fn step(&mut self, action: usize) {
+    fn step(&mut self, action: usize) -> (usize, f64) {
         let row = self.agent_pos / 5;
         let col = self.agent_pos % 5;
 
@@ -117,6 +117,7 @@ impl MonteCarloEnvironment for GridWorld {
         };
 
         self.agent_pos = result;
+        (self.agent_pos, self.score())
     }
 
     fn score(&self) -> f64 {

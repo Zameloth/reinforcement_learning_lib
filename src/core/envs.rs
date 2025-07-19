@@ -6,7 +6,7 @@ pub trait Environment {
 
 pub trait MonteCarloEnvironment: Environment {
     fn reset(&mut self); // renvoie l’état initial
-    fn step(&mut self, action: usize); // (next_state, reward, done)
+    fn step(&mut self, action: usize) -> (usize, f64); // (next_state, reward, done)
     fn score(&self) -> f64;
     fn is_game_over(&self) -> bool;
     fn available_actions(&self) -> Vec<usize> {
