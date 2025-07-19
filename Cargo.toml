@@ -11,9 +11,9 @@ path = "src/lib.rs"
 name = "main"
 path = "src/experiments/main.rs"
 
-#[[bin]]
-#name = "test_secret_envs"
-#path = "src/environments/secret_envs.rs"
+[[bin]]
+name = "run_policy"
+path = "src/experiments/run_policy.rs"
 
 [dependencies]
 rand = "0.9.1"

@@ -1,10 +1,18 @@
 use crate::core::envs;
-use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment};
+use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment, MonteCarloEnvironment};
 use rand::random_range;
 
 #[derive(Debug)]
-struct LineWorld {
+pub struct LineWorld {
     agent_pos: usize,
+}
+
+impl LineWorld {
+    pub fn new() -> LineWorld {
+        let mut env = LineWorld { agent_pos: 0 };
+        env.reset();
+        env
+    }
 }
 
 impl Environment for LineWorld {
