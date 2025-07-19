@@ -36,7 +36,8 @@ pub fn dyna_q(
 
         while !env.is_game_over() {
             let s = current_state(&env);
-            let a = choose_action(&q, s, actions, epsilon);
+            let actions = env.available_actions();
+            let a = choose_action(&q, s, &actions, epsilon);
             let (r, s_prime) = environment_step(&mut env, a);
 
             println!(
