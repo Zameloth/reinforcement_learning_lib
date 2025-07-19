@@ -13,7 +13,7 @@ path = "src/experiments/main.rs"
 
 [[bin]]
 name = "run_policy"
-path = "src/experiments/run_policy.rs"
+path = "src/experiments/test_exp.rs"
 
 [dependencies]
 rand = "0.9.1"
