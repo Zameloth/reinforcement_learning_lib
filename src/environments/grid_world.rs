@@ -61,6 +61,14 @@ pub struct GridWorld {
     agent_pos: usize,
 }
 
+impl GridWorld {
+    pub fn new() -> Self {
+        let mut env = Self { agent_pos: 0 };
+        env.reset();
+        env
+    }
+}
+
 impl Environment for GridWorld {
     fn num_states(&self) -> usize {
         25

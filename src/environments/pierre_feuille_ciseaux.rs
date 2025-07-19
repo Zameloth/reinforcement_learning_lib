@@ -8,7 +8,7 @@ use rand::random_range;
 ///     Feuille = 1
 ///     Ciseau = 2
 
-fn pierre_feuille_ciseaux_dp() -> DPEnvironment {
+pub fn pierre_feuille_ciseaux_dp() -> DPEnvironment {
     let num_states = 13; // état initial + 3 états possibles + 3*3 états finaux
     let num_actions = 3; // pierre, feuille, ciseaux
     let num_rewards = 3;
@@ -60,7 +60,7 @@ fn pierre_feuille_ciseaux_dp() -> DPEnvironment {
     env
 }
 
-struct PierreFeuilleCiseaux {
+pub struct PierreFeuilleCiseaux {
     round_number: usize,
     last_action: usize,
     adv_action: usize,
@@ -78,6 +78,21 @@ impl Environment for PierreFeuilleCiseaux {
     }
     fn num_rewards(&self) -> usize {
         3
+    }
+}
+
+impl PierreFeuilleCiseaux {
+    pub fn new() -> Self {
+        let mut env = Self {
+            round_number: 0,
+            last_action: 0,
+            adv_action: 0,
+            score: 0.0,
+            state: 0,
+        };
+        
+        env.reset();
+        env
     }
 }
 
