@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-use rand::seq::IteratorRandom;
-use rand::thread_rng;
-
+use crate::algorithms::planning::helpers::{choose_action, build_policy};
 use crate::core::envs::MonteCarloEnvironment;
-use crate::environments::helpers::{current_state, environment_step, choose_action};
-use crate::environments::line_world::LineWorld;
+use crate::core::policies::DeterministicPolicy;
+
+use std::collections::HashMap;
 
 type State = usize;
 type Action = usize;
@@ -15,36 +13,37 @@ type Action = usize;
 ///
 /// où max_a' est la meilleure action possible dans s′ (greedy)
 pub fn q_learning(
-    states: &[State],
+    env: &mut dyn MonteCarloEnvironment,
     alpha: f64,
     gamma: f64,
     epsilon: f64,
     episodes: usize,
-) {
+) -> DeterministicPolicy {
+    let states = (0..env.num_states()).collect::<Vec<_>>();
+    let actions = env.available_actions();
+
     let mut q: HashMap<(State, Action), f64> = HashMap::new();
 
-    for &s in states {
-        q.insert((s, 0), 0.0);
-        q.insert((s, 1), 0.0);
+    for &s in &states {
+        for &a in &actions {
+            q.insert((s, a), 0.0);
+        }
     }
 
     for episode in 1..=episodes {
         println!("=== Épisode {} ===", episode);
-
-        let mut env = LineWorld { agent_pos: 2 };
         env.reset();
 
         while !env.is_game_over() {
-            let s = current_state(&env);
+            let s = env.state_id();
             let actions = env.available_actions();
             let a = choose_action(&q, s, &actions, epsilon);
 
-            let (r, s_prime) = environment_step(&mut env, a);
+            env.step(a);
+            let s_prime = env.state_id();
+            let r = env.score();
 
-            println!(
-                "State: {}, Action: {}, Reward: {}, Next State: {}",
-                s, a, r, s_prime
-            );
+            println!("State: {}, Action: {}, Reward: {}, Next State: {}", s, a, r, s_prime);
 
             let q_sa = *q.get(&(s, a)).unwrap();
 
@@ -56,13 +55,10 @@ pub fn q_learning(
 
             q.insert(
                 (s, a),
-                q_sa + alpha * (r + gamma * max_q_sprime - q_sa)
+                q_sa + alpha * (r + gamma * max_q_sprime - q_sa),
             );
         }
-
-        println!("Q-table à la fin de l’épisode {} :", episode);
-        for ((state, action), val) in &q {
-            println!("Q[({}, {})] = {:.3}", state, action, val);
-        }
     }
+
+    build_policy(&q, &states, &actions, env)
 }
