@@ -1,6 +1,6 @@
 use crate::core::envs::MonteCarloEnvironment;
-use rand::{rng, Rng};
 use rand::prelude::IndexedRandom;
+use rand::{rng, Rng};
 
 pub fn on_policy_first_visit_mc_control(
     env: &mut dyn MonteCarloEnvironment,
@@ -52,61 +52,16 @@ pub fn on_policy_first_visit_mc_control(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::envs::{Environment, MonteCarloEnvironment};
+    use crate::core::envs::Environment;
     use crate::environments::line_world::LineWorld;
-
-    struct LineWorldTest {
-        env: LineWorld,
-    }
-
-    impl Environment for LineWorldTest {
-        fn num_states(&self) -> usize {
-            self.env.num_states()
-        }
-        fn num_actions(&self) -> usize {
-            self.env.num_actions()
-        }
-        fn num_rewards(&self) -> usize {
-            self.env.num_rewards()
-        }
-    }
-
-    impl MonteCarloEnvironment for LineWorldTest {
-        fn reset(&mut self) {
-            self.env.reset();
-        }
-        fn step(&mut self, action: usize) {
-            self.env.step(action);
-        }
-        fn score(&self) -> f64 {
-            self.env.score()
-        }
-        fn is_game_over(&self) -> bool {
-            self.env.is_game_over()
-        }
-        fn start_from_random_state(&mut self) {
-            self.env.start_from_random_state();
-        }
-        fn state_id(&self) -> usize {
-            self.env.agent_pos
-        }
-        fn display(&self) {
-            self.env.display();
-        }
-        fn is_forbidden(&self, action: usize) -> bool {
-            self.env.is_forbidden(action)
-        }
-    }
 
     #[test]
     fn test_on_policy_first_visit_mc_control_learns() {
-        let mut env = LineWorldTest {
-            env: LineWorld { agent_pos: 0 },
-        };
+        let mut env = LineWorld::new();
 
         let (policy, q) = on_policy_first_visit_mc_control(&mut env, 10_000, 0.9, 0.1);
 
-        // export CSV 
+        // export CSV
         use std::fs::File;
         use std::io::{BufWriter, Write};
         let mut file = BufWriter::new(File::create("output_on_policy.csv").unwrap());

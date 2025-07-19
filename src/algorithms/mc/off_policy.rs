@@ -57,63 +57,10 @@ mod tests {
     use crate::core::envs::{Environment, MonteCarloEnvironment};
     use crate::environments::line_world::LineWorld;
 
-    struct LineWorldTest {
-        env: LineWorld,
-    }
-
-    impl Environment for LineWorldTest {
-        fn num_states(&self) -> usize {
-            self.env.num_states()
-        }
-
-        fn num_actions(&self) -> usize {
-            self.env.num_actions()
-        }
-
-        fn num_rewards(&self) -> usize {
-            self.env.num_rewards()
-        }
-    }
-
-    impl MonteCarloEnvironment for LineWorldTest {
-        fn reset(&mut self) {
-            self.env.reset();
-        }
-
-        fn step(&mut self, action: usize) {
-            self.env.step(action);
-        }
-
-        fn score(&self) -> f64 {
-            self.env.score()
-        }
-
-        fn is_game_over(&self) -> bool {
-            self.env.is_game_over()
-        }
-
-        fn start_from_random_state(&mut self) {
-            self.env.start_from_random_state();
-        }
-
-        fn state_id(&self) -> usize {
-            self.env.agent_pos
-        }
-
-        fn display(&self) {
-            self.env.display();
-        }
-
-        fn is_forbidden(&self, _action: usize) -> bool {
-            false
-        }
-    }
 
     #[test]
     fn test_off_policy_mc_control_learns() {
-        let mut env = LineWorldTest {
-            env: LineWorld { agent_pos: 0 },
-        };
+        let mut env = LineWorld::new();
 
         let (policy, q) = off_policy_mc_control(&mut env, 10_000, 0.9, 0.1);
 
