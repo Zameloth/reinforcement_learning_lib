@@ -1,9 +1,18 @@
 use crate::core::envs;
-use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment};
+use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment, MonteCarloEnvironment};
+use rand::random_range;
 
 #[derive(Debug)]
 pub struct LineWorld {
-    pub agent_pos: usize,
+    agent_pos: usize,
+}
+
+impl LineWorld {
+    pub fn new() -> LineWorld {
+        let mut env = LineWorld { agent_pos: 0 };
+        env.reset();
+        env
+    }
 }
 
 impl Environment for LineWorld {
@@ -25,7 +34,7 @@ impl envs::MonteCarloEnvironment for LineWorld {
         self.agent_pos = 2;
     }
 
-    fn step(&mut self, action: usize) {
+    fn step(&mut self, action: usize) -> (usize, f64) {
         assert!(action < self.num_actions());
         assert!(!self.is_game_over());
 
@@ -34,6 +43,8 @@ impl envs::MonteCarloEnvironment for LineWorld {
             1 => self.agent_pos += 1,
             _ => unreachable!(),
         }
+        
+        (self.state_id(), self.score())
     }
 
     fn score(&self) -> f64 {
@@ -50,19 +61,23 @@ impl envs::MonteCarloEnvironment for LineWorld {
     }
 
     fn display(&self) {
-        todo!()
+        let line: String = (0..self.num_states())
+            .map(|i| if i == self.agent_pos { 'A' } else { '-' })
+            .collect();
+        println!("{}", line);
     }
 
     fn start_from_random_state(&mut self) {
-        todo!()
+        self.reset();
+        self.agent_pos = random_range(0..5);
     }
 
     fn state_id(&self) -> usize {
-        todo!()
+        self.agent_pos
     }
 
     fn is_forbidden(&self, action: usize) -> bool {
-        todo!()
+        action >= self.num_actions()
     }
 }
 
@@ -132,6 +147,13 @@ mod tests {
         // Test d'un pas après fin de partie panique - on utilise AssertUnwindSafe
         let result = catch_unwind(AssertUnwindSafe(|| env.step(1)));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_display_line_world() {
+        let mut env = LineWorld { agent_pos: 0 };
+        env.reset();
+        env.display();
     }
 
     #[test]

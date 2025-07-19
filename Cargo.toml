@@ -11,13 +11,15 @@ path = "src/lib.rs"
 name = "main"
 path = "src/experiments/main.rs"
 
-#[[bin]]
-#name = "test_secret_envs"
-#path = "src/environments/secret_envs.rs"
+[[bin]]
+name = "run_policy"
+path = "src/experiments/run_policy.rs"
 
 [dependencies]
 rand = "0.9.1"
 libloading = "0.8.8"
+serde_json = "1.0.141"
+serde = { version = "1.0.219", features = ["derive"] }
 
 [dev-dependencies]
 reinforcement_learning_lib = {path = "."}
