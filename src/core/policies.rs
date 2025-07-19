@@ -18,7 +18,7 @@ pub struct ProbabilisticPolicy {
 pub struct DeterministicPolicy {
     pub policy_table: Vec<usize>,
     pub(crate) num_states: usize,
-    pub(crate) num_actions: usize,
+    num_actions: usize,
 }
 
 impl Display for DeterministicPolicy {
