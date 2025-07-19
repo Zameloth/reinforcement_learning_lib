@@ -1,5 +1,6 @@
 use crate::core::envs::MonteCarloEnvironment;
-use rand::{thread_rng, Rng};
+use rand::{rng, thread_rng, Rng};
+use rand::prelude::IndexedRandom;
 
 pub fn off_policy_mc_control(
     env: &mut dyn MonteCarloEnvironment,
@@ -13,7 +14,7 @@ pub fn off_policy_mc_control(
     let mut c = vec![vec![0.0; num_actions]; num_states];
     let mut policy = vec![0; num_states];
 
-    let mut rng = thread_rng();
+    let mut rng = rng();
 
     for _ in 0..episodes {
         env.reset();
@@ -21,8 +22,8 @@ pub fn off_policy_mc_control(
 
         while !env.is_game_over() {
             let s = env.state_id();
-            let a = if rng.gen::<f64>() < epsilon_behavior {
-                rng.gen_range(0..num_actions)
+            let a = if rng.random::<f64>() < epsilon_behavior {
+                *env.available_actions().choose(&mut rng).unwrap()
             } else {
                 policy[s]
             };

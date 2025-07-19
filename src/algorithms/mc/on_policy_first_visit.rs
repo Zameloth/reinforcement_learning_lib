@@ -1,5 +1,6 @@
 use crate::core::envs::MonteCarloEnvironment;
 use rand::{rng, Rng};
+use rand::prelude::IndexedRandom;
 
 pub fn on_policy_first_visit_mc_control(
     env: &mut dyn MonteCarloEnvironment,
@@ -21,7 +22,7 @@ pub fn on_policy_first_visit_mc_control(
         while !env.is_game_over() {
             let s = env.state_id();
             let a = if rng.random::<f64>() < epsilon {
-                rng.random_range(0..num_actions)
+                *env.available_actions().choose(&mut rng).unwrap()
             } else {
                 policy[s]
             };

@@ -1,5 +1,6 @@
 use crate::core::envs::MonteCarloEnvironment;
-use rand::{rng, Rng};
+use rand::rng;
+use rand::seq::IndexedRandom;
 
 pub fn monte_carlo_es(
     env: &mut dyn MonteCarloEnvironment,
@@ -17,10 +18,11 @@ pub fn monte_carlo_es(
     for _ in 0..episodes {
         env.start_from_random_state();
 
+        // Déroulement épisode
         let mut episode = Vec::new();
         while !env.is_game_over() {
             let s = env.state_id();
-            let a = rng.random_range(0..num_actions);
+            let a = *env.available_actions().choose(&mut rng).unwrap();
             env.step(a);
             let r = env.score();
             episode.push((s, a, r));
@@ -29,6 +31,7 @@ pub fn monte_carlo_es(
         let mut g = 0.0;
         let mut visited = vec![];
 
+        //boucle de mise à jour
         for &(s, a, r) in episode.iter().rev() {
             g = gamma * g + r;
             if !visited.contains(&(s, a)) {
@@ -50,63 +53,18 @@ pub fn monte_carlo_es(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::envs::{Environment, MonteCarloEnvironment};
+    use crate::core::envs::{Environment};
     use crate::environments::line_world::LineWorld;
-
-    struct LineWorldTest {
-        env: LineWorld,
-    }
-
-    impl Environment for LineWorldTest {
-        fn num_states(&self) -> usize {
-            self.env.num_states()
-        }
-        fn num_actions(&self) -> usize {
-            self.env.num_actions()
-        }
-        fn num_rewards(&self) -> usize {
-            self.env.num_rewards()
-        }
-    }
-
-    impl MonteCarloEnvironment for LineWorldTest {
-        fn reset(&mut self) {
-            self.env.reset();
-        }
-        fn step(&mut self, action: usize) {
-            self.env.step(action);
-        }
-        fn score(&self) -> f64 {
-            self.env.score()
-        }
-        fn is_game_over(&self) -> bool {
-            self.env.is_game_over()
-        }
-        fn start_from_random_state(&mut self) {
-            self.env.start_from_random_state();
-        }
-        fn state_id(&self) -> usize {
-            self.env.agent_pos
-        }
-        fn display(&self) {
-            self.env.display();
-        }
-        fn is_forbidden(&self, action: usize) -> bool {
-            self.env.is_forbidden(action)
-        }
-    }
 
     #[test]
     fn test_monte_carlo_es_runs_and_learns() {
-        let mut env = LineWorldTest {
-            env: LineWorld { agent_pos: 0 },
-        };
+        let mut env = LineWorld::new();
 
         let (policy, q) = monte_carlo_es(&mut env, 10_000, 0.9);
 
         // Export CSV pour visualisation
         use std::fs::File;
-        use std::io::{Write, BufWriter};
+        use std::io::{BufWriter, Write};
         let mut file = BufWriter::new(File::create("output_mc_es.csv").unwrap());
 
         for (s, actions) in q.iter().enumerate() {
