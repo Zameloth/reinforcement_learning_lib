@@ -1,6 +1,7 @@
 use rand::random_range;
 use crate::core::envs;
 use crate::core::envs::{DPEnvironment, DynamicProgramingEnvironment, Environment};
+use rand::random_range;
 
 #[derive(Debug)]
 pub struct LineWorld {
@@ -51,7 +52,10 @@ impl envs::MonteCarloEnvironment for LineWorld {
     }
 
     fn display(&self) {
-        todo!()
+        let line: String = (0..self.num_states())
+            .map(|i| if i == self.agent_pos { 'A' } else { '-' })
+            .collect();
+        println!("{}", line);
     }
 
     fn start_from_random_state(&mut self) {
@@ -60,11 +64,11 @@ impl envs::MonteCarloEnvironment for LineWorld {
     }
 
     fn state_id(&self) -> usize {
-        todo!()
+        self.agent_pos
     }
 
     fn is_forbidden(&self, action: usize) -> bool {
-        todo!()
+        action >= self.num_actions()
     }
 }
 
@@ -134,6 +138,13 @@ mod tests {
         // Test d'un pas après fin de partie panique - on utilise AssertUnwindSafe
         let result = catch_unwind(AssertUnwindSafe(|| env.step(1)));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_display_line_world() {
+        let mut env = LineWorld { agent_pos: 0 };
+        env.reset();
+        env.display();
     }
 
     #[test]

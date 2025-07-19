@@ -54,6 +54,7 @@ pub mod dynamic_programming {
     }
 }
 
+use rand::random_range;
 use crate::core::envs::{Environment, MonteCarloEnvironment};
 
 pub struct GridWorld {
@@ -131,19 +132,32 @@ impl MonteCarloEnvironment for GridWorld {
     }
 
     fn display(&self) {
-        todo!()
+        let size = 5;
+        for row in 0..size {
+            let line: String = (0..size)
+                .map(|col| {
+                    let idx = row * size + col;
+                    if idx == self.agent_pos {
+                        'A'
+                    } else {
+                        '.'
+                    }
+                })
+                .collect();
+            println!("{}", line);
+        }
     }
 
     fn start_from_random_state(&mut self) {
-        todo!()
+        self.agent_pos = random_range(0..self.num_states())
     }
 
     fn state_id(&self) -> usize {
-        todo!()
+        self.agent_pos
     }
 
     fn is_forbidden(&self, action: usize) -> bool {
-        todo!()
+        action >= self.num_actions()
     }
 }
 
@@ -226,5 +240,12 @@ mod tests {
         assert_eq!(env.agent_pos, 24);
         assert_eq!(env.score(), 1.0);
         assert!(env.is_game_over());
+    }
+
+    #[test]
+    fn test_display() {
+        let mut env = GridWorld { agent_pos: 0 };
+        env.reset();
+        env.display();
     }
 }

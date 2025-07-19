@@ -63,6 +63,8 @@ struct PierreFeuilleCiseaux {
     round_number: usize,
     last_action: usize,
     adv_action: usize,
+    score: f64,
+    state: usize,
 }
 
 impl Environment for PierreFeuilleCiseaux {
@@ -83,6 +85,7 @@ impl MonteCarloEnvironment for PierreFeuilleCiseaux {
         self.round_number=0;
         self.last_action=0;
         self.adv_action=0;
+        self.score=0.0;
     }
 
     fn step(&mut self, action: usize) {
@@ -96,6 +99,7 @@ impl MonteCarloEnvironment for PierreFeuilleCiseaux {
             }
             self.round_number += 1;
             self.last_action = action;
+            self.score += self.score();
         }
         else {
             unreachable!()
@@ -130,18 +134,67 @@ impl MonteCarloEnvironment for PierreFeuilleCiseaux {
 
 
     fn display(&self) {
-        todo!()
+        // helper pour convertir action en symbole
+        fn sym(a: usize) -> &'static str {
+            match a {
+                0 => "✊", // pierre
+                1 => "✋", // feuille
+                2 => "✌️", // ciseau
+                _ => "?",
+            }
+        }
+
+        println!("=== Pierre-Feuille-Ciseaux ===");
+        match self.round_number {
+            0 => {
+                println!("État initial. Prêt pour le round 1.");
+            }
+            1 => {
+                println!("Round 1 terminé :");
+                println!("  Vous avez joué   : {}", sym(self.last_action));
+                println!("  L’adversaire a joué : {}", sym(self.adv_action));
+                println!("Prochain coup (round 2).");
+            }
+            2 => {
+                // terminal
+                println!("Partie terminée (après 2 rounds) :");
+                println!("  Round 1 → vous : {}  / adv : {}", sym(self.last_action), sym(self.adv_action));
+                // Here last_action and adv_action reflect round 2 as well;
+                // we actually need to stash round1 and round2 separately if we want both.
+                // Avec la structure actuelle, on n’a que le dernier coup – on peut afficher juste le résultat final :
+                let r = self.score();
+                let outcome = if r > 0.0 {
+                    "Vous gagnez 🎉"
+                } else if r < 0.0 {
+                    "Vous perdez 💥"
+                } else {
+                    "Égalité 🤝"
+                };
+                println!("Résultat final : {}", outcome);
+            }
+            _ => unreachable!(),
+        }
     }
 
     fn start_from_random_state(&mut self) {
-        todo!()
+        self.reset();
+
+        let nb_round:usize = random_range(0..3);
+        for _ in 0..nb_round {
+            self.step(random_range(0..3));
+        }
     }
 
     fn state_id(&self) -> usize {
-        todo!()
+        match self.round_number {
+            0 => 0,
+            1 => 1 + self.adv_action,
+            2 => 4 + self.last_action * 3 + self.adv_action,
+            _ => unreachable!(),
+        }
     }
 
     fn is_forbidden(&self, action: usize) -> bool {
-        todo!()
+        action >= self.num_actions()
     }
 }
