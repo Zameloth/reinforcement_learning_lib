@@ -1,15 +1,17 @@
-use crate::core::envs::{DynamicProgramingEnvironment};
+use crate::core::envs::DynamicProgramingEnvironment;
 use crate::core::policies::DeterministicPolicy;
+use indicatif::ProgressIterator;
 
 pub fn value_iteration(
     env: &dyn DynamicProgramingEnvironment,
     theta: f64,
     gamma: f64,
+    max_iter: usize,
 ) -> (DeterministicPolicy, Vec<f64>) {
     let mut policy: DeterministicPolicy = DeterministicPolicy::new_det_pol(env);
     let mut values = vec![0.0; env.num_states()];
-    
-    loop {
+
+    for _ in (0..max_iter).progress() {
         let mut delta: f64 = 0.0;
 
         for s in 0..env.num_states() {
@@ -42,6 +44,7 @@ pub fn value_iteration(
             return (policy, values);
         }
     }
+    (policy, values)
 }
 
 #[cfg(test)]
@@ -52,19 +55,22 @@ mod tests {
     #[test]
     fn test_value_iteration() {
         let env = line_world_dp();
-
-        let (policy, values) = value_iteration(&env, 0.0001, 0.99);
         let expected = vec![0, 1, 1, 1, 0];
-        println!("Values : {:?}", values);
-        println!("Policy : {}", policy);
 
-        for s in 0..3 {
-            assert_eq!(
-                expected[s],
-                policy.get_action(&s),
-                "État {} doit aller à droite",
-                s
-            )
+        for _ in 0..50 {
+            let (policy, values) = value_iteration(&env, 0.0001, 0.99, 1000);
+
+            println!("Values : {:?}", values);
+            println!("Policy : {}", policy);
+
+            for s in 0..3 {
+                assert_eq!(
+                    expected[s],
+                    policy.get_action(&s),
+                    "État {} doit aller à droite",
+                    s
+                )
+            }
         }
     }
 }

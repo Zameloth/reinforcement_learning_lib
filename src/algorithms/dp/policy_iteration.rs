@@ -1,5 +1,6 @@
-use crate::core::envs::{DynamicProgramingEnvironment};
+use crate::core::envs::DynamicProgramingEnvironment;
 use crate::core::policies::DeterministicPolicy;
+use indicatif::ProgressIterator;
 
 pub fn policy_evaluation(
     env: &dyn DynamicProgramingEnvironment,
@@ -53,23 +54,28 @@ pub fn policy_improvement(
         let old_actions = old_policy.get_action(&s);
         let mut best_action: Option<usize> = None;
         let mut best_value: f64 = f64::NEG_INFINITY;
+
         for a in 0..env.num_actions() {
             let mut score = 0.0;
+
             for s_prime in 0..env.num_states() {
                 for r_index in 0..env.num_rewards() {
                     let r = env.get_reward(r_index);
                     let p = env.get_transition_prob(s, a, s_prime, r_index);
                     score += p * (r + gamma * v[s_prime]);
-                    if best_action.is_none() || score > best_value {
-                        best_action = Some(a);
-                        best_value = score;
-                    }
                 }
-                if best_action.unwrap() != old_actions {
-                    policy_is_stable = false;
+
+                if best_action.is_none() || score > best_value {
+                    best_action = Some(a);
+                    best_value = score;
                 }
-                new_policy.set_action(&s, best_action.unwrap())
             }
+
+            let choosen_action = best_action.unwrap();
+            if choosen_action != old_actions {
+                policy_is_stable = false;
+            }
+            new_policy.set_action(&s, choosen_action);
         }
     }
     (new_policy, policy_is_stable)
@@ -79,19 +85,24 @@ pub fn policy_iteration(
     env: &dyn DynamicProgramingEnvironment,
     theta: f64,
     gamma: f64,
+    max_iter: usize,
 ) -> (DeterministicPolicy, Vec<f64>) {
     let mut policy = DeterministicPolicy::new_det_pol(env);
+    let mut values = vec![0.0; env.num_states()];
 
-    loop {
+    for _ in (0..max_iter).progress() {
         let v = policy_evaluation(env, &policy, theta, gamma);
 
         let (new_policy, policy_is_stable) = policy_improvement(env, &policy, &v, gamma);
 
-        if !policy_is_stable {
+        if policy_is_stable {
             return (new_policy, v);
         }
         policy = new_policy;
+        values = v;
     }
+
+    (policy, values)
 }
 
 #[cfg(test)]
@@ -124,17 +135,20 @@ mod tests {
     #[test]
     fn test_policy_iteration() {
         let env = line_world_dp();
-
-        let (policy, _) = policy_iteration(&env, 0.0001, 0.99);
         let expected = vec![0, 1, 1, 1, 0];
+        for i in 0..50{
+            let (policy, _) = policy_iteration(&env, 0.0001, 0.99, 1000);
 
-        for s in 0..3 {
-            assert_eq!(
-                expected[s],
-                policy.get_action(&s),
-                "État {} doit aller à droite",
-                s
-            )
+
+            for s in 0..3 {
+                assert_eq!(
+                    expected[s],
+                    policy.get_action(&s),
+                    "État {} doit aller à droite",
+                    s
+                )
+            }
         }
+
     }
 }
