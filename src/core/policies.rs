@@ -4,8 +4,8 @@ use rand::random;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
-use std::{fs, io};
 use std::io::Write;
+use std::{fs, io};
 
 /// Interface générale pour les policies
 pub trait Policy {
@@ -22,8 +22,8 @@ pub struct ProbabilisticPolicy {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeterministicPolicy {
     pub policy_table: Vec<usize>,
-    pub(crate) num_states: usize,
-    pub(crate) num_actions: usize,
+    num_states: usize,
+    num_actions: usize,
 }
 
 impl Display for DeterministicPolicy {
@@ -99,14 +99,13 @@ impl Policy for ProbabilisticPolicy {
 }
 
 fn save_to_file<T: Serialize>(obj: &T, path: &str) -> io::Result<()> {
-    let json = serde_json::to_string_pretty(obj)
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    let json =
+        serde_json::to_string_pretty(obj).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
     fs::write(path, json)
 }
 
 fn load_from_file<T: DeserializeOwned>(path: &str) -> io::Result<T> {
     let json = fs::read_to_string(path)?;
-    let obj = serde_json::from_str(&json)
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+    let obj = serde_json::from_str(&json).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
     Ok(obj)
 }

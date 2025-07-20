@@ -43,7 +43,7 @@ impl envs::MonteCarloEnvironment for LineWorld {
             1 => self.agent_pos += 1,
             _ => unreachable!(),
         }
-        
+
         (self.state_id(), self.score())
     }
 

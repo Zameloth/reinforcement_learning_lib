@@ -1,29 +1,18 @@
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Charger le fichier CSV
-df = pd.read_csv("output_off_policy.csv", names=["state", "action", "q_value"])
+# Lecture des Q-valeurs
+df = pd.read_csv("q_values_off_policy.csv", names=["state", "action", "q_value"])
 
-# Créer une table Q
-q_table = df.pivot(index="state", columns="action", values="q_value").fillna(0)
+# Pivot pour la heatmap
+pivot = df.pivot(index="state", columns="action", values="q_value")
 
-# Déduire la meilleure action par état
-best_actions = q_table.idxmax(axis=1)
+# Heatmap inversée (si tu veux le rouge pour le négatif)
+sns.heatmap(pivot, annot=True, cmap="coolwarm_r", fmt=".2f")
 
-# Plot flèches
-plt.figure(figsize=(5, 5))
-for state, action in best_actions.items():
-    if action == 0:
-        plt.text(0.5, state, '←', fontsize=20, ha='center')
-    elif action == 1:
-        plt.text(0.5, state, '→', fontsize=20, ha='center')
-
-plt.ylim(-0.5, 4.5)
-plt.xlim(0, 1)
-plt.xticks([])
-plt.yticks(range(len(q_table.index)))
-plt.title("Politique Apprise Off-Policy (meilleure action par état)")
-plt.xlabel("← gauche / → droite")
-plt.ylabel("État")
-plt.grid(True)
+plt.title("Q-values Heatmap - Off Policy MC Control")
+plt.xlabel("Action")
+plt.ylabel("State")
+plt.tight_layout()
 plt.show()
