@@ -6,12 +6,8 @@ use std::collections::HashMap;
 
 type State = usize;
 type Action = usize;
+type QTable = HashMap<(State, Action), f64>;
 
-/// Q‑Learning (off‑policy TD control)
-///
-/// Q(s,a) ← Q(s,a) + α [ r + γ max_a' Q(s',a') − Q(s,a) ]
-///
-/// où max_a' est la meilleure action possible dans s′ (greedy)
 pub fn q_learning(
     env: &mut dyn MonteCarloEnvironment,
     alpha: f64,
@@ -19,46 +15,65 @@ pub fn q_learning(
     epsilon: f64,
     episodes: usize,
 ) -> DeterministicPolicy {
-    let states = (0..env.num_states()).collect::<Vec<_>>();
-    let actions = env.available_actions();
+    // pour build_policy à la fin
+    let all_states  = (0..env.num_states()).collect::<Vec<_>>();
+    env.reset();
+    let all_actions = env.available_actions();
 
-    let mut q: HashMap<(State, Action), f64> = HashMap::new();
+    let mut q: QTable = HashMap::new();
 
-    for &s in &states {
-        for &a in &actions {
-            q.insert((s, a), 0.0);
-        }
+    for ep in 1..=episodes {
+        println!("=== Épisode {} ===", ep);
+        run_episode(env, &mut q, alpha, gamma, epsilon);
     }
 
-    for episode in 1..=episodes {
-        println!("=== Épisode {} ===", episode);
-        env.reset();
+    build_policy(&q, &all_states, &all_actions, env)
+}
 
-        while !env.is_game_over() {
-            let s = env.state_id();
-            let actions = env.available_actions();
-            let a = choose_action(&q, s, &actions, epsilon);
+fn run_episode(
+    env: &mut dyn MonteCarloEnvironment,
+    q: &mut QTable,
+    alpha: f64,
+    gamma: f64,
+    epsilon: f64,
+) {
+    env.reset();
+    while !env.is_game_over() {
+        let s        = env.state_id();
+        let actions  = env.available_actions();
+        let a        = choose_action(q, s, &actions, epsilon);
 
-            env.step(a);
-            let s_prime = env.state_id();
-            let r = env.score();
+        env.step(a);
+        let s_next   = env.state_id();
+        let reward   = env.score();
+        println!("S={} A={} R={} S'={}", s, a, reward, s_next);
 
-            println!("State: {}, Action: {}, Reward: {}, Next State: {}", s, a, r, s_prime);
+        let next_actions = env.available_actions();
+        let max_q_next   = compute_max_q(q, s_next, &next_actions);
 
-            let q_sa = *q.get(&(s, a)).unwrap();
-
-            let actions_prime = env.available_actions();
-            let max_q_sprime = actions_prime
-                .iter()
-                .map(|&ap| *q.get(&(s_prime, ap)).unwrap_or(&0.0))
-                .fold(f64::MIN, f64::max);
-
-            q.insert(
-                (s, a),
-                q_sa + alpha * (r + gamma * max_q_sprime - q_sa),
-            );
-        }
+        apply_q_update(q, s, a, reward, max_q_next, gamma, alpha);
     }
+}
 
-    build_policy(&q, &states, &actions, env)
+/// max_{a'} Q(s', a')
+fn compute_max_q(q: &QTable, s_next: State, actions: &[Action]) -> f64 {
+    actions
+        .iter()
+        .copied()
+        .map(|ap| *q.get(&(s_next, ap)).unwrap_or(&0.0))
+        .fold(0.0, f64::max)
+}
+
+/// Q(s,a) += α [r + γ max_q_next − Q(s,a)]
+fn apply_q_update(
+    q: &mut QTable,
+    s: State,
+    a: Action,
+    reward: f64,
+    max_q_next: f64,
+    gamma: f64,
+    alpha: f64,
+) {
+    let entry = q.entry((s, a)).or_insert(0.0);
+    *entry += alpha * (reward + gamma * max_q_next - *entry);
 }
