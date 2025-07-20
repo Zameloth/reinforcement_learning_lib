@@ -4,8 +4,8 @@ fn main() {
     let config = Config {
         env_name: "secret_0".into(),
         algorithm: "exp_sarsa".into(),
-        alpha: 0.1,
-        epsilon: 0.1,
+        alpha: 0.01,
+        epsilon: 0.5,
         gamma: 0.99,
         theta: 1e-4,
         kappa: 0.001,

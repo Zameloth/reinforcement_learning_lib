@@ -163,7 +163,7 @@ pub fn run_experiment(cfg: &Config) {
             let (policy, rewards) = sarsa(&mut *env_mc, cfg.alpha, cfg.gamma, cfg.epsilon, cfg.max_iter);
             ExperimentResult::PolicyOnly { policy, rewards }
         }
-        "expected_sarsa" => {
+        "exp_sarsa" => {
             let (policy, rewards) = expected_sarsa(&mut *env_mc, cfg.alpha, cfg.gamma, cfg.epsilon, cfg.max_iter);
             ExperimentResult::PolicyOnly { policy, rewards }
         }
@@ -196,6 +196,7 @@ pub fn run_experiment(cfg: &Config) {
             save_to_file(&values, &format!("{}/values.csv", cfg.output_dir)).unwrap();
             let avg = evaluate_policy(&mut *env_mc, &policy, eval_episodes, cfg.gamma);
             save_to_file(&avg, &format!("{}/avg_reward.txt", cfg.output_dir)).unwrap();
+            save_to_file(&duration, &format!("{}/duration.txt", cfg.output_dir)).unwrap();
             println!("Avg reward ({} eps): {:.4}", eval_episodes, avg);
         }
         ExperimentResult::PolicyQValues { policy, q_values, rewards } => {
@@ -204,6 +205,7 @@ pub fn run_experiment(cfg: &Config) {
             save_to_file(&rewards, &format!("{}/rewards.csv", cfg.output_dir)).unwrap();
             let avg = evaluate_policy(&mut *env_mc, &policy, eval_episodes, cfg.gamma);
             save_to_file(&avg, &format!("{}/avg_reward.txt", cfg.output_dir)).unwrap();
+            save_to_file(&duration, &format!("{}/duration.txt", cfg.output_dir)).unwrap();
             println!("Avg reward ({} eps): {:.4}", eval_episodes, avg);
         }
         ExperimentResult::PolicyOnly { policy, rewards } => {
@@ -211,6 +213,7 @@ pub fn run_experiment(cfg: &Config) {
             save_to_file(&rewards, &format!("{}/rewards.csv", cfg.output_dir)).unwrap();
             let avg = evaluate_policy(&mut *env_mc, &policy, eval_episodes, cfg.gamma);
             save_to_file(&avg, &format!("{}/avg_reward.txt", cfg.output_dir)).unwrap();
+            save_to_file(&duration, &format!("{}/duration.txt", cfg.output_dir)).unwrap();
             println!("Avg reward ({} eps): {:.4}", eval_episodes, avg);
         }
     }
