@@ -102,6 +102,8 @@ pub fn run_experiment(cfg: &Config) {
         "grid_world" => Box::new(grid_world()),
         "pfs" => Box::new(pierre_feuille_ciseaux_dp()),
         "secret_0" => Box::new(SecretEnv::new(0).unwrap()),
+        "secret_1" => Box::new(SecretEnv::new(1).unwrap()),
+        "secret_2" => Box::new(SecretEnv::new(2).unwrap()),
         _ => panic!("Environnement DP inconnu: {}", cfg.env_name),
     };
     let mut env_mc: Box<dyn MonteCarloEnvironment> = match cfg.env_name.as_str() {
@@ -109,9 +111,12 @@ pub fn run_experiment(cfg: &Config) {
         "grid_world" => Box::new(GridWorld::new()),
         "pfs" => Box::new(PierreFeuilleCiseaux::new()),
         "secret_0" => Box::new(SecretEnv::new(0).unwrap()),
+        "secret_1" => Box::new(SecretEnv::new(1).unwrap()),
+        "secret_2" => Box::new(SecretEnv::new(2).unwrap()),
         _ => panic!("Environnement MC inconnu: {}", cfg.env_name),
     };
 
+    let start_entrainement = std::time::Instant::now();
     // Exécuter l'algorithme choisi
     let result: ExperimentResult<_, Vec<f64>, Vec<Vec<f64>>> = match cfg.algorithm.as_str() {
         // DP algorithms return (policy, Vec<f64>)
@@ -200,6 +205,9 @@ pub fn run_experiment(cfg: &Config) {
         }
         _ => panic!("Algorithme inconnu: {}", cfg.algorithm),
     };
+
+    let entrainement_duration = start_entrainement.elapsed();
+    println!("Durée de l'entrainement : {:?}", entrainement_duration);
 
     // Créer répertoire de sortie
     std::fs::create_dir_all(&cfg.output_dir).expect("Impossible de créer le répertoire de sortie");
