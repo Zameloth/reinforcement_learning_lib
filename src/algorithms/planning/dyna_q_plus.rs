@@ -33,8 +33,9 @@ pub fn dyna_q_plus(
     let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
-        println!("=== Épisode {} ===", ep);
-        env.reset();
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }        env.reset();
         let mut total_reward = 0.0;
 
         while !env.is_game_over() {
@@ -45,7 +46,6 @@ pub fn dyna_q_plus(
             let s_n = env.state_id();
             let r = env.score();
             total_reward += r;
-            println!("S={} A={} R={} S'={}", s, a, r, s_n);
 
             // Initialisation paresseuse
             q.entry((s, a)).or_insert(0.0);

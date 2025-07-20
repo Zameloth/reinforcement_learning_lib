@@ -90,7 +90,11 @@ pub fn policy_iteration(
     let mut policy = DeterministicPolicy::new_det_pol(env);
     let mut values = vec![0.0; env.num_states()];
 
-    for _ in (0..max_iter).progress() {
+    for ep in (0..max_iter).progress() {
+        if ep % 100 == 0 {
+            println!("=== Iteration {} ===", ep);
+        }
+        
         let v = policy_evaluation(env, &policy, theta, gamma);
 
         let (new_policy, policy_is_stable) = policy_improvement(env, &policy, &v, gamma);

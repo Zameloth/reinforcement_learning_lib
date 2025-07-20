@@ -11,7 +11,11 @@ pub fn value_iteration(
     let mut policy: DeterministicPolicy = DeterministicPolicy::new_det_pol(env);
     let mut values = vec![0.0; env.num_states()];
 
-    for _ in (0..max_iter).progress() {
+    for ep in (0..max_iter).progress() {
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }
+        
         let mut delta: f64 = 0.0;
 
         for s in 0..env.num_states() {

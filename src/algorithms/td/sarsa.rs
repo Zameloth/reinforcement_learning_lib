@@ -26,8 +26,9 @@ pub fn sarsa(
     let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
-        println!("=== Épisode {} ===", ep);
-        let total_reward = run_episode(env, &mut q, alpha, gamma, epsilon);
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }        let total_reward = run_episode(env, &mut q, alpha, gamma, epsilon);
         rewards_per_episode.push(total_reward);
     }
 
@@ -55,7 +56,6 @@ fn run_episode(
         let r = env.score();
         total_reward += r;
         let s_next = env.state_id();
-        println!("S={} A={} R={} S'={}", s, a, r, s_next);
 
         if env.is_game_over() {
             update_terminal(q, s, a, r, alpha);

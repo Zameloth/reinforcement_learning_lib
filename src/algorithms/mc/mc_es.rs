@@ -19,7 +19,10 @@ pub fn monte_carlo_es(
     let mut rewards_per_episode = Vec::with_capacity(episodes);
     let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);
 
-    for _ in 0..episodes {
+    for ep in 0..episodes {
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }
         // Start from a random state for ES
         env.start_from_random_state();
 

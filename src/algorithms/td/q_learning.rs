@@ -25,7 +25,9 @@ pub fn q_learning(
     let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
-        println!("=== Épisode {} ===", ep);
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }
         let total_reward = run_episode(env, &mut q, alpha, gamma, epsilon);
         rewards_per_episode.push(total_reward);
     }
@@ -53,7 +55,6 @@ fn run_episode(
         let s_next   = env.state_id();
         let reward   = env.score();
         total_reward += reward;
-        println!("S={} A={} R={} S'={}", s, a, reward, s_next);
 
         let next_actions = env.available_actions();
         let max_q_next   = compute_max_q(q, s_next, &next_actions);

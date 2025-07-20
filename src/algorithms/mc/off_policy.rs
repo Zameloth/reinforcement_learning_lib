@@ -18,7 +18,10 @@ pub fn off_policy_mc_control(
     let mut rewards_per_episode = Vec::with_capacity(episodes);
     let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);
 
-    for _ in 0..episodes {
+    for ep in 0..episodes {
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }
         env.reset();
         let mut episode = Vec::new();
         let mut total_reward = 0.0;

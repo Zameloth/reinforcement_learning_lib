@@ -26,7 +26,9 @@ pub fn dyna_q(
     let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
-        println!("=== Épisode {} ===", ep);
+        if ep % 100 == 0 {
+            println!("=== Épisode {} ===", ep);
+        }
         // Exécute l'épisode et récupère la récompense totale
         let total_reward = run_episode(
             env,
@@ -69,7 +71,6 @@ fn run_episode<R: rand::Rng>(
         let s_next = env.state_id();
         let reward = env.score();
         total_reward += reward;
-        println!("S={} A={} R={} S'={}", s, a, reward, s_next);
 
         update_q(q, s, a, reward, s_next, gamma, alpha);
         model.insert((s, a), (reward, s_next));
