@@ -135,7 +135,7 @@ impl MonteCarloEnvironment for SecretEnv {
             step_fn(self.env, action);
         }
 
-        (self.state_id(), self.get_reward(self.state_id()))
+        (self.state_id(), self.score())
     }
 
     fn score(&self) -> f64 {
