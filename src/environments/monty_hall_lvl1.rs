@@ -192,6 +192,10 @@ impl MonteCarloEnvironment for MontyHallEnv {
     fn is_forbidden(&self, action: usize) -> bool {
         !self.portes_disponibles.contains(&action)
     }
+
+    fn action_name(&self, action: usize) -> String {
+        format!("Porte {}", action + 1)
+    }
 }
 
 pub fn new_monty_hall(lvl: usize) -> MontyHallEnv {

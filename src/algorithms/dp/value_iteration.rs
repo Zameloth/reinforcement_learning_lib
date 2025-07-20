@@ -1,6 +1,5 @@
 use crate::core::envs::DynamicProgramingEnvironment;
 use crate::core::policies::DeterministicPolicy;
-use indicatif::ProgressIterator;
 
 pub fn value_iteration(
     env: &dyn DynamicProgramingEnvironment,
@@ -11,9 +10,9 @@ pub fn value_iteration(
     let mut policy: DeterministicPolicy = DeterministicPolicy::new_det_pol(env);
     let mut values = vec![0.0; env.num_states()];
 
-    for ep in (0..max_iter).progress() {
+    for ep in 0..max_iter{
         if ep % 100 == 0 {
-            println!("=== Épisode {} ===", ep);
+            println!("=== Iteration {} ===", ep);
         }
         
         let mut delta: f64 = 0.0;
