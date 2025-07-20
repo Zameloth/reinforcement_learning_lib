@@ -19,6 +19,48 @@ path = "src/experiments/test_exp.rs"
 name = "lw_policy_it"
 path = "src/experiments/line_world/policy_iteration.rs"
 
+
+######################### Secret env 0 ########################################
+[[bin]]
+name = "secret_env_0_dynaq"
+path = "src/experiments/secret_env_0/dyna_q.rs"
+
+[[bin]]
+name = "secret_env_0_dynaq+"
+path = "src/experiments/secret_env_0/dyna_q_plus.rs"
+
+[[bin]]
+name = "secret_env_0_sarsa"
+path = "src/experiments/secret_env_0/sarsa.rs"
+
+[[bin]]
+name = "secret_env_0_exp_sarsa"
+path = "src/experiments/secret_env_0/exp_sarsa.rs"
+
+[[bin]]
+name = "secret_env_0_mc_es"
+path = "src/experiments/secret_env_0/mc_es.rs"
+
+[[bin]]
+name = "secret_env_0_mc_off"
+path = "src/experiments/secret_env_0/off_pol.rs"
+
+[[bin]]
+name = "secret_env_0_mc_on"
+path = "src/experiments/secret_env_0/on_pol.rs"
+
+[[bin]]
+name = "secret_env_0_pol_it"
+path = "src/experiments/secret_env_0/pol_it.rs"
+
+[[bin]]
+name = "secret_env_0_q_learning"
+path = "src/experiments/secret_env_0/q_learning.rs"
+
+[[bin]]
+name = "secret_env_0_value_it"
+path = "src/experiments/secret_env_0/value_it.rs"
+
 [dependencies]
 rand = "0.9.1"
 libloading = "0.8.8"
