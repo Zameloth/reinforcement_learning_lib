@@ -55,6 +55,7 @@ pub fn monte_carlo_es(
 
                 // Mise à jour de la politique
                 let best_action = (0..num_actions)
+                    .filter(|&a| !env.is_forbidden(a))
                     .max_by(|&a1, &a2| q[s][a1].partial_cmp(&q[s][a2]).unwrap())
                     .unwrap();
                 policy.set_action(&s, best_action);
