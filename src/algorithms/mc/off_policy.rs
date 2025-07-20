@@ -19,7 +19,7 @@ pub fn off_policy_mc_control(
     let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);
 
     for ep in 0..episodes {
-        if ep % 100 == 0 {
+        if ep % 1000 == 0 {
             println!("=== Épisode {} ===", ep);
         }
         env.reset();
@@ -32,7 +32,12 @@ pub fn off_policy_mc_control(
             let a = if rng.random::<f64>() < epsilon_behavior {
                 *env.available_actions().choose(&mut rng).unwrap()
             } else {
-                policy.get_action(&s)
+                // Si l'action de la policy est forbidden, choisi une action aléatoire
+                let a = policy.get_action(&s);
+                if env.is_forbidden(a) {
+                    *env.available_actions().choose(&mut rng).unwrap()
+                }
+                else { a }
             };
             env.step(a);
             let r = env.score();
