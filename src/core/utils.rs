@@ -7,7 +7,7 @@ use crate::algorithms::mc::{
 use crate::algorithms::planning::{dyna_q::dyna_q, dyna_q_plus::dyna_q_plus};
 use crate::algorithms::td::{expected_sarsa::expected_sarsa, q_learning::q_learning, sarsa::sarsa};
 use crate::core::envs::{DynamicProgramingEnvironment, MonteCarloEnvironment};
-use crate::core::policies::save_to_file;
+use crate::core::policies::{save_to_file, Policy};
 use crate::environments::grid_world::dynamic_programming::grid_world;
 use crate::environments::grid_world::GridWorld;
 use crate::environments::line_world::{line_world_dp, LineWorld};
@@ -65,6 +65,33 @@ enum ExperimentResult<P, SV, QV> {
     PolicyValues { policy: P, values: SV }, // DP: Vec<f64> state values
     PolicyOnly { policy: P },               // TD & Planning: policy seule
     PolicyQValues { policy: P, q_values: QV }, // MC: Vec<Vec<f64>> Q-values
+}
+
+/// Évalue une policy sur un environnement MC pour calculer la récompense totale moyenne
+fn evaluate_policy(
+    env: &mut dyn MonteCarloEnvironment,
+    policy: &dyn Policy,
+    num_episodes: usize,
+    gamma: f64,
+) -> f64 {
+    let mut total_return = 0.0;
+    for _ in 0..num_episodes {
+        env.reset();
+        let mut G = 0.0;
+        let mut t = 0;
+        loop {
+            let state = env.state_id();
+            let action = policy.get_action(&state);
+            let (next_state, reward) = env.step(action);
+            G += reward * gamma.powi(t);
+            t += 1;
+            if env.is_game_over() {
+                break;
+            }
+        }
+        total_return += G;
+    }
+    total_return / (num_episodes as f64)
 }
 
 /// Lance l'entraînement selon la configuration et sauvegarde les résultats
@@ -177,18 +204,41 @@ pub fn run_experiment(cfg: &Config) {
     // Créer répertoire de sortie
     std::fs::create_dir_all(&cfg.output_dir).expect("Impossible de créer le répertoire de sortie");
 
-    // Sauvegarder selon le type de résultat
+    // Sauvegarde des résultats et évaluation de la policy
+    // Nombre d'épisodes pour l'évaluation
+    let eval_episodes = 1000;
     match result {
         ExperimentResult::PolicyValues { policy, values } => {
             save_to_file(&policy, &format!("{}/policy.json", cfg.output_dir)).unwrap();
             save_to_file(&values, &format!("{}/values.csv", cfg.output_dir)).unwrap();
+
+            let avg_reward = evaluate_policy(&mut *env_mc, &policy, eval_episodes, cfg.gamma);
+            save_to_file(&avg_reward, &format!("{}/avg_reward.txt", cfg.output_dir)).unwrap();
+            println!(
+                "Average total reward ({} eps): {:.4}",
+                eval_episodes, avg_reward
+            );
         }
         ExperimentResult::PolicyQValues { policy, q_values } => {
             save_to_file(&policy, &format!("{}/policy.json", cfg.output_dir)).unwrap();
             save_to_file(&q_values, &format!("{}/q_values.csv", cfg.output_dir)).unwrap();
+
+            let avg_reward = evaluate_policy(&mut *env_mc, &policy, eval_episodes, cfg.gamma);
+            save_to_file(&avg_reward, &format!("{}/avg_reward.txt", cfg.output_dir)).unwrap();
+            println!(
+                "Average total reward ({} eps): {:.4}",
+                eval_episodes, avg_reward
+            );
         }
         ExperimentResult::PolicyOnly { policy } => {
             save_to_file(&policy, &format!("{}/policy.json", cfg.output_dir)).unwrap();
+
+            let avg_reward = evaluate_policy(&mut *env_mc, &policy, eval_episodes, cfg.gamma);
+            save_to_file(&avg_reward, &format!("{}/avg_reward.txt", cfg.output_dir)).unwrap();
+            println!(
+                "Average total reward ({} eps): {:.4}",
+                eval_episodes, avg_reward
+            );
         }
     }
 
