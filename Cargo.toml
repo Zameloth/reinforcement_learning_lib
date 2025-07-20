@@ -26,7 +26,7 @@ name = "lw_dynaq"
 path = "src/experiments/line_world/dyna_q.rs"
 
 [[bin]]
-name = "lw_dynaq+"
+name = "lw_dynaqp"
 path = "src/experiments/line_world/dyna_q_plus.rs"
 
 [[bin]]
@@ -34,7 +34,7 @@ name = "lw_sarsa"
 path = "src/experiments/line_world/sarsa.rs"
 
 [[bin]]
-name = "lw_sarsa"
+name = "lw_exp_sarsa"
 path = "src/experiments/line_world/exp_sarsa.rs"
 
 [[bin]]
@@ -65,7 +65,7 @@ name = "gw_dynaq"
 path = "src/experiments/grid_world/dyna_q.rs"
 
 [[bin]]
-name = "gw_dynaq+"
+name = "gw_dynaqp"
 path = "src/experiments/grid_world/dyna_q_plus.rs"
 
 [[bin]]
@@ -73,7 +73,7 @@ name = "gw_sarsa"
 path = "src/experiments/grid_world/sarsa.rs"
 
 [[bin]]
-name = "gw_sarsa"
+name = "gw_exp_sarsa"
 path = "src/experiments/grid_world/exp_sarsa.rs"
 
 [[bin]]
@@ -104,7 +104,7 @@ name = "mh_dynaq"
 path = "src/experiments/monty_hall_lvl1/dyna_q.rs"
 
 [[bin]]
-name = "mh_dynaq+"
+name = "mh_dynaqp"
 path = "src/experiments/monty_hall_lvl1/dyna_q_plus.rs"
 
 [[bin]]
@@ -112,7 +112,7 @@ name = "mh_sarsa"
 path = "src/experiments/monty_hall_lvl1/sarsa.rs"
 
 [[bin]]
-name = "mh_sarsa"
+name = "mh_exp_sarsa"
 path = "src/experiments/monty_hall_lvl1/exp_sarsa.rs"
 
 [[bin]]
@@ -143,7 +143,7 @@ name = "pfc_dynaq"
 path = "src/experiments/pierre_feuille_ciseaux/dyna_q.rs"
 
 [[bin]]
-name = "pfc_dynaq+"
+name = "pfc_dynaqp"
 path = "src/experiments/pierre_feuille_ciseaux/dyna_q_plus.rs"
 
 [[bin]]
@@ -151,7 +151,7 @@ name = "pfc_sarsa"
 path = "src/experiments/pierre_feuille_ciseaux/sarsa.rs"
 
 [[bin]]
-name = "pfc_sarsa"
+name = "pfc_exp_sarsa"
 path = "src/experiments/pierre_feuille_ciseaux/exp_sarsa.rs"
 
 [[bin]]
@@ -178,7 +178,7 @@ name = "secret_env_0_dynaq"
 path = "src/experiments/secret_env_0/dyna_q.rs"
 
 [[bin]]
-name = "secret_env_0_dynaq+"
+name = "secret_env_0_dynaqp"
 path = "src/experiments/secret_env_0/dyna_q_plus.rs"
 
 [[bin]]
@@ -212,6 +212,91 @@ path = "src/experiments/secret_env_0/q_learning.rs"
 [[bin]]
 name = "secret_env_0_value_it"
 path = "src/experiments/secret_env_0/value_it.rs"
+
+
+######################### Secret env 1 ########################################
+[[bin]]
+name = "secret_env_1_dynaq"
+path = "src/experiments/secret_env_1/dyna_q.rs"
+
+[[bin]]
+name = "secret_env_1_dynaqp"
+path = "src/experiments/secret_env_1/dyna_q_plus.rs"
+
+[[bin]]
+name = "secret_env_1_sarsa"
+path = "src/experiments/secret_env_1/sarsa.rs"
+
+[[bin]]
+name = "secret_env_1_exp_sarsa"
+path = "src/experiments/secret_env_1/exp_sarsa.rs"
+
+[[bin]]
+name = "secret_env_1_mc_es"
+path = "src/experiments/secret_env_1/mc_es.rs"
+
+[[bin]]
+name = "secret_env_1_mc_off"
+path = "src/experiments/secret_env_1/off_pol.rs"
+
+[[bin]]
+name = "secret_env_1_mc_on"
+path = "src/experiments/secret_env_1/on_pol.rs"
+
+[[bin]]
+name = "secret_env_1_pol_it"
+path = "src/experiments/secret_env_1/pol_it.rs"
+
+[[bin]]
+name = "secret_env_1_q_learning"
+path = "src/experiments/secret_env_1/q_learning.rs"
+
+[[bin]]
+name = "secret_env_1_value_it"
+path = "src/experiments/secret_env_1/value_it.rs"
+
+
+######################### Secret env 2 ########################################
+[[bin]]
+name = "secret_env_2_dynaq"
+path = "src/experiments/secret_env_2/dyna_q.rs"
+
+[[bin]]
+name = "secret_env_2_dynaqp"
+path = "src/experiments/secret_env_2/dyna_q_plus.rs"
+
+[[bin]]
+name = "secret_env_2_sarsa"
+path = "src/experiments/secret_env_2/sarsa.rs"
+
+[[bin]]
+name = "secret_env_2_exp_sarsa"
+path = "src/experiments/secret_env_2/exp_sarsa.rs"
+
+[[bin]]
+name = "secret_env_2_mc_es"
+path = "src/experiments/secret_env_2/mc_es.rs"
+
+[[bin]]
+name = "secret_env_2_mc_off"
+path = "src/experiments/secret_env_2/off_pol.rs"
+
+[[bin]]
+name = "secret_env_2_mc_on"
+path = "src/experiments/secret_env_2/on_pol.rs"
+
+[[bin]]
+name = "secret_env_2_pol_it"
+path = "src/experiments/secret_env_2/pol_it.rs"
+
+[[bin]]
+name = "secret_env_2_q_learning"
+path = "src/experiments/secret_env_2/q_learning.rs"
+
+[[bin]]
+name = "secret_env_2_value_it"
+path = "src/experiments/secret_env_2/value_it.rs"
+
 
 [dependencies]
 rand = "0.9.1"
