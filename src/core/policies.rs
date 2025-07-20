@@ -1,6 +1,11 @@
 use crate::core::envs::{DynamicProgramingEnvironment, Environment};
 use rand;
 use std::fmt::{Display, Formatter};
+use crate::core::envs::MonteCarloEnvironment;
+use rand::random;
+use rand::Rng;
+
+
 
 /// Interface générale pour les policies
 pub trait Policy {
@@ -72,12 +77,26 @@ impl ProbabilisticPolicy {
         }
         probs
     }
-
-    // pub fn new_pb_pol_MC(env: MonteCarloEnvironment) -> Self {
-    //
-    // }
+}
+/*
+    pub fn new_pb_pol_MC(env: MonteCarloEnvironment) -> Self {
+    
+     }
 }
 
-// impl Policy for ProbabilisticPolicy {
-//  
-// }
+impl Policy for ProbabilisticPolicy {
+
+ } */
+  // creer autom une poltique deter avec une action choisi aleatoirement pour chaque etat 
+impl DeterministicPolicy {
+    pub fn new_det_pol_mc(env: &dyn MonteCarloEnvironment) -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            policy_table: (0..env.num_states())
+                .map(|_| rng.gen_range(0..env.num_actions()))
+                .collect(),
+            num_states: env.num_states(),
+            num_actions: env.num_actions(),
+        }
+    }
+}

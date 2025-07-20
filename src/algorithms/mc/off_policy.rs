@@ -1,4 +1,5 @@
 use crate::core::envs::MonteCarloEnvironment;
+use crate::core::policies::{DeterministicPolicy, Policy}; 
 use rand::{thread_rng, Rng};
 
 pub fn off_policy_mc_control(
@@ -6,12 +7,13 @@ pub fn off_policy_mc_control(
     episodes: usize,
     gamma: f64,
     epsilon_behavior: f64,
-) -> (Vec<usize>, Vec<Vec<f64>>) {
+) -> (DeterministicPolicy, Vec<Vec<f64>>) {
     let num_states = env.num_states();
     let num_actions = env.num_actions();
     let mut q = vec![vec![0.0; num_actions]; num_states];
     let mut c = vec![vec![0.0; num_actions]; num_states];
-    let mut policy = vec![0; num_states];
+
+    let mut policy = DeterministicPolicy::new_det_pol_mc(env); 
 
     let mut rng = thread_rng();
 
@@ -24,7 +26,7 @@ pub fn off_policy_mc_control(
             let a = if rng.gen::<f64>() < epsilon_behavior {
                 rng.gen_range(0..num_actions)
             } else {
-                policy[s]
+                policy.get_action(&s) 
             };
             env.step(a);
             let r = env.score();
@@ -37,10 +39,13 @@ pub fn off_policy_mc_control(
             g = gamma * g + r;
             c[s][a] += w;
             q[s][a] += (w / c[s][a]) * (g - q[s][a]);
-            policy[s] = (0..num_actions)
+
+            let best_action = (0..num_actions)
                 .max_by(|&a1, &a2| q[s][a1].partial_cmp(&q[s][a2]).unwrap())
                 .unwrap();
-            if a != policy[s] {
+            policy.set_action(&s, best_action); 
+
+            if a != best_action {
                 break;
             }
             w /= 1.0 / num_actions as f64;
@@ -49,11 +54,11 @@ pub fn off_policy_mc_control(
 
     (policy, q)
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::core::envs::{Environment, MonteCarloEnvironment};
+    use crate::core::policies::Policy;
     use crate::environments::line_world::LineWorld;
 
     struct LineWorldTest {
@@ -116,11 +121,11 @@ mod tests {
 
         let (policy, q) = off_policy_mc_control(&mut env, 10_000, 0.9, 0.1);
 
-        // Export CSV
+        //  Export CSV
         use std::fs::File;
         use std::io::{Write, BufWriter};
 
-        let mut file = BufWriter::new(File::create("output_off_policy.csv").unwrap());
+        let mut file = BufWriter::new(File::create("src/algorithms/mc/q_values_off_policy.csv").unwrap());
 
         for (s, actions) in q.iter().enumerate() {
             for (a, &q_val) in actions.iter().enumerate() {
@@ -128,20 +133,25 @@ mod tests {
             }
         }
 
-        assert_eq!(policy.len(), env.num_states());
+        assert_eq!(policy.policy_table.len(), env.num_states()); // 
 
-        for &a in &policy {
-            assert!(a < env.num_actions(), "Action hors borne: {}", a);
+
+        for s in 0..env.num_states() {
+            let a = policy.get_action(&s);
+            assert!(
+                a < env.num_actions(),
+                "Action hors borne à l'état {}: {}", s, a
+            );
         }
 
-        for actions in q.iter() {
+        for actions in &q {
             for &value in actions {
                 assert!(value.is_finite());
             }
         }
 
         let s = 3;
-        let best_action = policy[s];
+        let best_action = policy.get_action(&s);
         assert!(
             q[s][best_action] > 0.5,
             "Q-value trop faible sur état positif : {}",

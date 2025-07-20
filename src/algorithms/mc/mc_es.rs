@@ -1,17 +1,21 @@
 use crate::core::envs::MonteCarloEnvironment;
 use rand::{rng, Rng};
+use rand::prelude::IndexedRandom;
+use crate::core::policies::DeterministicPolicy;
+use crate::core::envs::Environment;
+use crate::environments::line_world::LineWorld;
+
 
 pub fn monte_carlo_es(
     env: &mut dyn MonteCarloEnvironment,
     episodes: usize,
     gamma: f64,
-) -> (Vec<usize>, Vec<Vec<f64>>) {
+) -> (DeterministicPolicy, Vec<Vec<f64>>) {
     let num_states = env.num_states();
     let num_actions = env.num_actions();
     let mut q = vec![vec![0.0; num_actions]; num_states];
     let mut returns_count = vec![vec![0; num_actions]; num_states];
-    let mut policy = vec![0; num_states];
-
+    let mut policy = DeterministicPolicy::new_det_pol_mc(env);
     let mut rng = rng();
 
     for _ in 0..episodes {
@@ -20,7 +24,7 @@ pub fn monte_carlo_es(
         let mut episode = Vec::new();
         while !env.is_game_over() {
             let s = env.state_id();
-            let a = rng.random_range(0..num_actions);
+            let a = *env.available_actions().choose(&mut rng).unwrap();
             env.step(a);
             let r = env.score();
             episode.push((s, a, r));
@@ -37,103 +41,69 @@ pub fn monte_carlo_es(
                 let alpha = 1.0 / returns_count[s][a] as f64;
                 q[s][a] += alpha * (g - q[s][a]);
 
-                policy[s] = (0..num_actions)
+                //  Mise à jour avec set_action
+                let best_action = (0..num_actions)
                     .max_by(|&a1, &a2| q[s][a1].partial_cmp(&q[s][a2]).unwrap())
                     .unwrap();
+                policy.set_action(&s, best_action);
             }
         }
     }
 
     (policy, q)
 }
+#[test]
+fn test_monte_carlo_es_runs_and_learns() {
+    let mut env = LineWorld { agent_pos: 0 };
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::core::envs::{Environment, MonteCarloEnvironment};
-    use crate::environments::line_world::LineWorld;
+   
+    let (policy, q) = monte_carlo_es(&mut env, 10_000, 0.9);
 
-    struct LineWorldTest {
-        env: LineWorld,
+   
+    println!("\n=== Q-values ===");
+    for (s, actions) in q.iter().enumerate() {
+        println!("État {}: {:?}", s, actions);
     }
 
-    impl Environment for LineWorldTest {
-        fn num_states(&self) -> usize {
-            self.env.num_states()
-        }
-        fn num_actions(&self) -> usize {
-            self.env.num_actions()
-        }
-        fn num_rewards(&self) -> usize {
-            self.env.num_rewards()
+    // EXPORT CSV
+    use std::fs::File;
+    use std::io::{Write, BufWriter};
+
+    let file = File::create("q_values_mc_es.csv").expect("Erreur création fichier");
+    let mut writer = BufWriter::new(file);
+
+    writeln!(writer, "state,action,q_value").unwrap(); 
+
+    for (s, actions) in q.iter().enumerate() {
+        for (a, &q_val) in actions.iter().enumerate() {
+            writeln!(writer, "{},{},{}", s, a, q_val).unwrap();
         }
     }
+    println!("✅ Fichier exporté : q_values_mc_es.csv");
 
-    impl MonteCarloEnvironment for LineWorldTest {
-        fn reset(&mut self) {
-            self.env.reset();
-        }
-        fn step(&mut self, action: usize) {
-            self.env.step(action);
-        }
-        fn score(&self) -> f64 {
-            self.env.score()
-        }
-        fn is_game_over(&self) -> bool {
-            self.env.is_game_over()
-        }
-        fn start_from_random_state(&mut self) {
-            self.env.start_from_random_state();
-        }
-        fn state_id(&self) -> usize {
-            self.env.agent_pos
-        }
-        fn display(&self) {
-            self.env.display();
-        }
-        fn is_forbidden(&self, action: usize) -> bool {
-            self.env.is_forbidden(action)
-        }
-    }
+    //  VÉRIFICATIONS
+    assert_eq!(policy.policy_table.len(), env.num_states());
 
-    #[test]
-    fn test_monte_carlo_es_runs_and_learns() {
-        let mut env = LineWorldTest {
-            env: LineWorld { agent_pos: 0 },
-        };
 
-        let (policy, q) = monte_carlo_es(&mut env, 10_000, 0.9);
-
-        // Export CSV pour visualisation
-        use std::fs::File;
-        use std::io::{Write, BufWriter};
-        let mut file = BufWriter::new(File::create("output_mc_es.csv").unwrap());
-
-        for (s, actions) in q.iter().enumerate() {
-            for (a, &q_val) in actions.iter().enumerate() {
-                writeln!(file, "{},{},{}", s, a, q_val).unwrap();
-            }
-        }
-
-        //  Vérifications
-        assert_eq!(policy.len(), env.num_states());
-
-        for &a in &policy {
-            assert!(a < env.num_actions(), "Action hors borne: {}", a);
-        }
-
-        for actions in q.iter() {
-            for &value in actions {
-                assert!(value.is_finite());
-            }
-        }
-
-        let s = 3;
-        let best_action = policy[s];
+    for s in 0..env.num_states() {
+        let action = policy.get_action(&s);
         assert!(
-            q[s][best_action] > 0.5,
-            "Q-value trop faible sur état positif : {}",
-            q[s][best_action]
+            action < env.num_actions(),
+            "Action hors borne pour état {} : {}", s, action
         );
     }
+
+    for actions in q.iter() {
+        for &value in actions {
+            assert!(value.is_finite(), "Q-value non finie détectée !");
+        }
+    }
+
+    // 
+    let s = 3;
+    let best_action = policy.get_action(&s);
+    assert!(
+        q[s][best_action] > 0.5,
+        "Q-value trop faible à l'état 3 : {}", q[s][best_action]
+    );
 }
