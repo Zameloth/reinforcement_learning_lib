@@ -1,7 +1,7 @@
 use crate::core::envs::MonteCarloEnvironment;
 use crate::core::policies::DeterministicPolicy;
-use rand::prelude::IndexedRandom;
-use rand::{rng, Rng};
+use rand::prelude::{IndexedRandom, StdRng};
+use rand::{rng, Rng, SeedableRng};
 
 pub fn on_policy_first_visit_mc_control(
     env: &mut dyn MonteCarloEnvironment,
@@ -15,7 +15,7 @@ pub fn on_policy_first_visit_mc_control(
     let mut returns_count = vec![vec![0; num_actions]; num_states];
     let mut policy = DeterministicPolicy::new_det_pol(env);
 
-    let mut rng = rng();
+    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);;
 
     for _ in 0..episodes {
         env.reset();

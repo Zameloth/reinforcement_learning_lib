@@ -15,6 +15,10 @@ path = "src/experiments/main.rs"
 name = "run_policy"
 path = "src/experiments/test_exp.rs"
 
+[[bin]]
+name = "lw_policy_it"
+path = "src/experiments/line_world/policy_iteration.rs"
+
 [dependencies]
 rand = "0.9.1"
 libloading = "0.8.8"

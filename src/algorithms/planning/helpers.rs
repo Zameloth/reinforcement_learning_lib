@@ -1,9 +1,8 @@
-use rand::prelude::IndexedRandom;
-use rand::Rng;
-use std::collections::HashMap;
-
 use crate::core::envs::MonteCarloEnvironment;
 use crate::core::policies::DeterministicPolicy;
+use rand::prelude::{IndexedRandom, StdRng};
+use rand::{Rng, SeedableRng};
+use std::collections::HashMap;
 
 type State = usize;
 type Action = usize;
@@ -15,7 +14,7 @@ pub fn choose_action(
     actions: &[Action],
     epsilon: f64,
 ) -> Action {
-    let mut rng = rand::rng();
+    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);
 
     if rng.random::<f64>() < epsilon {
         // Exploration : choisir une action au hasard

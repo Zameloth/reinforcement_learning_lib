@@ -1,7 +1,9 @@
 use crate::algorithms::planning::helpers::{build_policy, choose_action};
 use crate::core::envs::MonteCarloEnvironment;
 use crate::core::policies::DeterministicPolicy;
+use rand::prelude::StdRng;
 use rand::seq::IteratorRandom;
+use rand::SeedableRng;
 use std::collections::HashMap;
 
 type State = usize;
@@ -19,7 +21,7 @@ pub fn dyna_q(
 ) -> DeterministicPolicy {
     let mut q = QTable::new();
     let mut model = Model::new();
-    let mut rng = rand::rng();
+    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);;
 
     for ep in 1..=episodes {
         println!("=== Épisode {} ===", ep);
