@@ -23,10 +23,6 @@ fn main() {
     io::stdin().read_line(&mut input).unwrap();
     let choix = input.trim().parse::<u32>().unwrap_or(0);
 
-    let states = vec![0, 1, 2, 3, 4];
-    let env = LineWorld { agent_pos: 2 };
-    let actions = env.available_actions();
-
     let alpha = 0.1;
     let gamma = 0.9;
     let epsilon = 0.1;
@@ -37,23 +33,33 @@ fn main() {
     match choix {
         1 => {
             println!("=== Dyna-Q ===");
-            dyna_q(&states, &actions, alpha, gamma, epsilon, n, episodes);
+            let mut env = LineWorld::new();
+            let policy = dyna_q(&mut env, alpha, gamma, epsilon, n, episodes);
+            println!("{}", policy);
         }
         2 => {
             println!("=== Dyna-Q+ ===");
-            dyna_q_plus(&states, &actions, alpha, gamma, epsilon, kappa, n, episodes);
+            let mut env = LineWorld::new();
+            let policy = dyna_q_plus(&mut env, alpha, gamma, epsilon, kappa, n, episodes);
+            println!("{}", policy);
         }
         3 => {
             println!("=== SARSA ===");
-            sarsa(&states, alpha, gamma, epsilon, episodes);
+            let mut env =  LineWorld::new();
+            let policy = sarsa(&mut env, alpha, gamma, epsilon, episodes);
+            println!("{}", policy);
         }
         4 => {
             println!("=== Q-Learning ===");
-            q_learning(&states, alpha, gamma, epsilon, episodes);
+            let mut env =  LineWorld::new();
+            let policy = q_learning(&mut env, alpha, gamma, epsilon, episodes);
+            println!("{}", policy);
         }
         5 => {
             println!("=== Expected SARSA ===");
-            expected_sarsa(&states, alpha, gamma, epsilon, episodes);
+            let mut env =  LineWorld::new();
+            let policy = expected_sarsa(&mut env, alpha, gamma, epsilon, episodes);
+            println!("{}", policy);
         }
         6 => {
             println!("=== Test Policy Iteration ===");

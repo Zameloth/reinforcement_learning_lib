@@ -22,8 +22,8 @@ pub struct ProbabilisticPolicy {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DeterministicPolicy {
     pub policy_table: Vec<usize>,
-    num_states: usize,
-    num_actions: usize,
+    pub(crate) num_states: usize,
+    pub(crate) num_actions: usize,
 }
 
 impl Display for DeterministicPolicy {

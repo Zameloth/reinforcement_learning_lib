@@ -1,74 +1,101 @@
-use std::collections::HashMap;
-use rand::seq::IteratorRandom;
-use rand::thread_rng;
-
+use crate::algorithms::planning::helpers::{choose_action, build_policy};
 use crate::core::envs::MonteCarloEnvironment;
-use crate::environments::helpers::{current_state, environment_step, choose_action};
-use crate::environments::line_world::LineWorld;
+use crate::core::policies::DeterministicPolicy;
+
+use std::collections::HashMap;
 
 type State = usize;
 type Action = usize;
+type QTable = HashMap<(State, Action), f64>;
 
-/// SARSA (on‑policy TD control)
-///
-/// Q(s,a) ← Q(s,a) + α [ r + γ Q(s',a') − Q(s,a) ]
-///
-/// où a′ est l’action effectivement choisie dans s′ (ε‑greedy)
+/// SARSA (on-policy TD control)
+/// Q(s,a) ← Q + α [r + γ Q(s',a') − Q]
 pub fn sarsa(
-    states: &[State],
+    env: &mut dyn MonteCarloEnvironment,
     alpha: f64,
     gamma: f64,
     epsilon: f64,
     episodes: usize,
-) {
-    let mut q: HashMap<(State, Action), f64> = HashMap::new();
+) -> DeterministicPolicy {
+    // Pour build_policy à la fin
+    let all_states  = (0..env.num_states()).collect::<Vec<_>>();
+    env.reset();
+    let all_actions = env.available_actions();
 
-    for &s in states {
-        q.insert((s, 0), 0.0);
-        q.insert((s, 1), 0.0);
+    let mut q: QTable = HashMap::new();
+
+    for ep in 1..=episodes {
+        println!("=== Épisode {} ===", ep);
+        run_episode(env, &mut q, alpha, gamma, epsilon);
     }
 
-    for episode in 1..=episodes {
-        println!("=== Épisode {} ===", episode);
+    build_policy(&q, &all_states, &all_actions, env)
+}
 
-        let mut env = LineWorld { agent_pos: 2 };
-        env.reset();
+fn run_episode(
+    env: &mut dyn MonteCarloEnvironment,
+    q: &mut QTable,
+    alpha: f64,
+    gamma: f64,
+    epsilon: f64,
+) {
+    env.reset();
+    // état et action initiaux
+    let mut s = env.state_id();
+    let mut actions = env.available_actions();
+    let mut a = choose_action(q, s, &actions, epsilon);
 
-        let mut s = current_state(&env);
-        let mut actions = env.available_actions();
-        let mut a = choose_action(&q, s, &actions, epsilon);
+    while !env.is_game_over() {
+        env.step(a);
+        let r = env.score();
+        let s_next = env.state_id();
+        println!("S={} A={} R={} S'={}", s, a, r, s_next);
 
-        while !env.is_game_over() {
-            let (r, s_prime) = environment_step(&mut env, a);
-
-            println!(
-                "State: {}, Action: {}, Reward: {}, Next State: {}",
-                s, a, r, s_prime
-            );
-
-            let q_sa = *q.get(&(s, a)).unwrap();
-
-            if env.is_game_over() {
-                q.insert((s, a), q_sa + alpha * (r - q_sa));
-                break;
-            }
-
-            actions = env.available_actions();
-            let a_prime = choose_action(&q, s_prime, &actions, epsilon);
-            let q_saprime = *q.get(&(s_prime, a_prime)).unwrap_or(&0.0);
-
-            q.insert(
-                (s, a),
-                q_sa + alpha * (r + gamma * q_saprime - q_sa)
-            );
-
-            s = s_prime;
-            a = a_prime;
+        // si terminal, on fait un dernier update sur r seul
+        if env.is_game_over() {
+            update_terminal(q, s, a, r, alpha);
+            break;
         }
 
-        println!("Q-table à la fin de l’épisode {} :", episode);
-        for ((state, action), val) in &q {
-            println!("Q[({}, {})] = {:.3}", state, action, val);
-        }
+        // sinon on choisit a' et on met à jour Q(s,a)
+        let next_actions = env.available_actions();
+        let a_next = choose_action(q, s_next, &next_actions, epsilon);
+        update_q(q, s, a, r, s_next, a_next, gamma, alpha);
+
+        s = s_next;
+        a = a_next;
     }
 }
+/// Q(s,a) += α [r + γ Q(s',a') − Q(s,a)]
+fn update_q(
+    q: &mut QTable,
+    s: State,
+    a: Action,
+    reward: f64,
+    s_next: State,
+    a_next: Action,
+    gamma: f64,
+    alpha: f64,
+) {
+    // Lire d'abord les valeurs actuelles hors du mutable borrow
+    let q_sa   = *q.get(&(s, a)).unwrap_or(&0.0);
+    let q_next = *q.get(&(s_next, a_next)).unwrap_or(&0.0);
+
+    // Calcul TD
+    let new_q = q_sa + alpha * (reward + gamma * q_next - q_sa);
+    q.insert((s, a), new_q);
+}
+
+/// Si s' est terminal, Q(s,a) += α [r − Q(s,a)]
+fn update_terminal(
+    q: &mut QTable,
+    s: State,
+    a: Action,
+    reward: f64,
+    alpha: f64,
+) {
+    let q_sa = *q.get(&(s, a)).unwrap_or(&0.0);
+    let new_q = q_sa + alpha * (reward - q_sa);
+    q.insert((s, a), new_q);
+}
+
