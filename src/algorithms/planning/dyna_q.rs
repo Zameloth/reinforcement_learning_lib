@@ -11,6 +11,7 @@ type Action = usize;
 type QTable = HashMap<(State, Action), f64>;
 type Model = HashMap<(State, Action), (f64, State)>;
 
+/// Dyna-Q with tracking of total reward per episode
 pub fn dyna_q(
     env: &mut dyn MonteCarloEnvironment,
     alpha: f64,
@@ -18,14 +19,16 @@ pub fn dyna_q(
     epsilon: f64,
     planning_steps: usize,
     episodes: usize,
-) -> DeterministicPolicy {
+) -> (DeterministicPolicy, Vec<f64>) {
     let mut q = QTable::new();
     let mut model = Model::new();
-    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);;
+    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);
+    let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
         println!("=== Épisode {} ===", ep);
-        run_episode(
+        // Exécute l'épisode et récupère la récompense totale
+        let total_reward = run_episode(
             env,
             &mut q,
             &mut model,
@@ -35,12 +38,14 @@ pub fn dyna_q(
             planning_steps,
             &mut rng,
         );
+        rewards_per_episode.push(total_reward);
     }
 
-    // Extraire états/actions rencontrés pour construire la policy
+    // Construction de la policy basée sur QTable
     let states: Vec<usize> = q.keys().map(|&(s, _)| s).collect();
     let actions: Vec<usize> = q.keys().map(|&(_, a)| a).collect();
-    build_policy(&q, &states, &actions, env)
+    let policy = build_policy(&q, &states, &actions, env);
+    (policy, rewards_per_episode)
 }
 
 fn run_episode<R: rand::Rng>(
@@ -52,8 +57,10 @@ fn run_episode<R: rand::Rng>(
     epsilon: f64,
     planning_steps: usize,
     rng: &mut R,
-) {
+) -> f64 {
     env.reset();
+    let mut total_reward = 0.0;
+
     while !env.is_game_over() {
         let s = env.state_id();
         let a = choose_action(q, s, &env.available_actions(), epsilon);
@@ -61,6 +68,7 @@ fn run_episode<R: rand::Rng>(
         env.step(a);
         let s_next = env.state_id();
         let reward = env.score();
+        total_reward += reward;
         println!("S={} A={} R={} S'={}", s, a, reward, s_next);
 
         update_q(q, s, a, reward, s_next, gamma, alpha);
@@ -70,6 +78,8 @@ fn run_episode<R: rand::Rng>(
             planning_step(q, model, gamma, alpha, rng);
         }
     }
+
+    total_reward
 }
 
 /// Q-update selon TD : Q(s,a) ← Q + α [r + γ max Q(s',·) – Q]
@@ -83,7 +93,6 @@ fn update_q(
     alpha: f64,
 ) {
     let q_sa = *q.get(&(s, a)).unwrap_or(&0.0);
-    // max_{a'} Q(s_next, a'): on filtre q par état, on extrait les valeurs, puis on prend le max
     let max_q_next = q
         .iter()
         .filter(|&(&(s2, _), _)| s2 == s_next)

@@ -12,6 +12,7 @@ type QTable = HashMap<(State, Action), f64>;
 type Model = HashMap<(State, Action), (f64, State)>;
 type Tau = HashMap<(State, Action), usize>;
 
+/// Dyna-Q+ with tracking of total reward per episode
 pub fn dyna_q_plus(
     env: &mut dyn MonteCarloEnvironment,
     alpha: f64,
@@ -20,55 +21,61 @@ pub fn dyna_q_plus(
     kappa: f64,
     planning_steps: usize,
     episodes: usize,
-) -> DeterministicPolicy {
-    // Récupérer la liste complète des états et des actions (supposées identiques partout)
+) -> (DeterministicPolicy, Vec<f64>) {
     let all_states = (0..env.num_states()).collect::<Vec<_>>();
     env.reset();
     let all_actions = env.available_actions();
 
-    let mut q = QTable::new();
-    let mut model = Model::new();
-    let mut tau = Tau::new();
-    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);;
+    let mut q: QTable = HashMap::new();
+    let mut model: Model = HashMap::new();
+    let mut tau: Tau = HashMap::new();
+    let mut rng = <StdRng as SeedableRng>::seed_from_u64(0);
+    let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
         println!("=== Épisode {} ===", ep);
         env.reset();
+        let mut total_reward = 0.0;
 
         while !env.is_game_over() {
             let s = env.state_id();
             let a = choose_action(&q, s, &env.available_actions(), epsilon);
+
             env.step(a);
             let s_n = env.state_id();
             let r = env.score();
+            total_reward += r;
             println!("S={} A={} R={} S'={}", s, a, r, s_n);
 
-            // lazy init
+            // Initialisation paresseuse
             q.entry((s, a)).or_insert(0.0);
             model.entry((s, a)).or_insert((0.0, s));
             tau.entry((s, a)).or_insert(0);
 
-            // mise à jour réelle
+            // Mise à jour réelle
             update_q(&mut q, s, a, r, s_n, gamma, alpha);
 
-            // maj modèle et τ
+            // Mise à jour du modèle et de tau
             model.insert((s, a), (r, s_n));
             tau.insert((s, a), 0);
             for (&sa, t) in tau.iter_mut() {
                 if sa != (s, a) {
-                    *t += 1
+                    *t += 1;
                 }
             }
 
-            // planning Dyna-Q+ avec bonus
+            // Planning Dyna-Q+ avec bonus
             for _ in 0..planning_steps {
                 planning_step_plus(&mut q, &model, &tau, gamma, alpha, kappa, &mut rng);
             }
         }
+
+        rewards_per_episode.push(total_reward);
     }
 
-    // Construire la policy sur tous les états/actions
-    build_policy(&q, &all_states, &all_actions, env)
+    // Construction de la policy sur tous les états/actions
+    let policy = build_policy(&q, &all_states, &all_actions, env);
+    (policy, rewards_per_episode)
 }
 
 fn update_q(

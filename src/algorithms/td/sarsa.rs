@@ -8,7 +8,7 @@ type State = usize;
 type Action = usize;
 type QTable = HashMap<(State, Action), f64>;
 
-/// SARSA (on-policy TD control)
+/// SARSA (on-policy TD control) with tracking of total reward per episode
 /// Q(s,a) ← Q + α [r + γ Q(s',a') − Q]
 pub fn sarsa(
     env: &mut dyn MonteCarloEnvironment,
@@ -16,20 +16,23 @@ pub fn sarsa(
     gamma: f64,
     epsilon: f64,
     episodes: usize,
-) -> DeterministicPolicy {
-    // Pour build_policy à la fin
+) -> (DeterministicPolicy, Vec<f64>) {
+    // États et actions globaux pour la construction de la policy
     let all_states  = (0..env.num_states()).collect::<Vec<_>>();
     env.reset();
     let all_actions = env.available_actions();
 
     let mut q: QTable = HashMap::new();
+    let mut rewards_per_episode = Vec::with_capacity(episodes);
 
     for ep in 1..=episodes {
         println!("=== Épisode {} ===", ep);
-        run_episode(env, &mut q, alpha, gamma, epsilon);
+        let total_reward = run_episode(env, &mut q, alpha, gamma, epsilon);
+        rewards_per_episode.push(total_reward);
     }
 
-    build_policy(&q, &all_states, &all_actions, env)
+    let policy = build_policy(&q, &all_states, &all_actions, env);
+    (policy, rewards_per_episode)
 }
 
 fn run_episode(
@@ -38,9 +41,11 @@ fn run_episode(
     alpha: f64,
     gamma: f64,
     epsilon: f64,
-) {
+) -> f64 {
     env.reset();
-    // état et action initiaux
+    let mut total_reward = 0.0;
+
+    // initial state and action
     let mut s = env.state_id();
     let actions = env.available_actions();
     let mut a = choose_action(q, s, &actions, epsilon);
@@ -48,16 +53,15 @@ fn run_episode(
     while !env.is_game_over() {
         env.step(a);
         let r = env.score();
+        total_reward += r;
         let s_next = env.state_id();
         println!("S={} A={} R={} S'={}", s, a, r, s_next);
 
-        // si terminal, on fait un dernier update sur r seul
         if env.is_game_over() {
             update_terminal(q, s, a, r, alpha);
             break;
         }
 
-        // sinon on choisit a' et on met à jour Q(s,a)
         let next_actions = env.available_actions();
         let a_next = choose_action(q, s_next, &next_actions, epsilon);
         update_q(q, s, a, r, s_next, a_next, gamma, alpha);
@@ -65,7 +69,10 @@ fn run_episode(
         s = s_next;
         a = a_next;
     }
+
+    total_reward
 }
+
 /// Q(s,a) += α [r + γ Q(s',a') − Q(s,a)]
 fn update_q(
     q: &mut QTable,
@@ -77,11 +84,8 @@ fn update_q(
     gamma: f64,
     alpha: f64,
 ) {
-    // Lire d'abord les valeurs actuelles hors du mutable borrow
     let q_sa   = *q.get(&(s, a)).unwrap_or(&0.0);
     let q_next = *q.get(&(s_next, a_next)).unwrap_or(&0.0);
-
-    // Calcul TD
     let new_q = q_sa + alpha * (reward + gamma * q_next - q_sa);
     q.insert((s, a), new_q);
 }
@@ -98,4 +102,3 @@ fn update_terminal(
     let new_q = q_sa + alpha * (reward - q_sa);
     q.insert((s, a), new_q);
 }
-

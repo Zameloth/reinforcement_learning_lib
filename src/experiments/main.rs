@@ -35,31 +35,31 @@ fn main() {
         1 => {
             println!("=== Dyna-Q ===");
             let mut env = LineWorld::new();
-            let policy = dyna_q(&mut env, alpha, gamma, epsilon, n, episodes);
+            let (policy, _) = dyna_q(&mut env, alpha, gamma, epsilon, n, episodes);
             println!("{}", policy);
         }
         2 => {
             println!("=== Dyna-Q+ ===");
             let mut env = LineWorld::new();
-            let policy = dyna_q_plus(&mut env, alpha, gamma, epsilon, kappa, n, episodes);
+            let (policy, _) = dyna_q_plus(&mut env, alpha, gamma, epsilon, kappa, n, episodes);
             println!("{}", policy);
         }
         3 => {
             println!("=== SARSA ===");
             let mut env = LineWorld::new();
-            let policy = sarsa(&mut env, alpha, gamma, epsilon, episodes);
+            let (policy, _) = sarsa(&mut env, alpha, gamma, epsilon, episodes);
             println!("{}", policy);
         }
         4 => {
             println!("=== Q-Learning ===");
             let mut env = LineWorld::new();
-            let policy = q_learning(&mut env, alpha, gamma, epsilon, episodes);
+            let (policy, _) = q_learning(&mut env, alpha, gamma, epsilon, episodes);
             println!("{}", policy);
         }
         5 => {
             println!("=== Expected SARSA ===");
             let mut env = LineWorld::new();
-            let policy = expected_sarsa(&mut env, alpha, gamma, epsilon, episodes);
+            let (policy, _) = expected_sarsa(&mut env, alpha, gamma, epsilon, episodes);
             println!("{}", policy);
         }
         6 => {

@@ -1,10 +1,11 @@
-use crate::core::envs::Environment;
+use crate::core::envs::{Environment, MonteCarloEnvironment};
 use rand;
-use rand::random;
+use rand::{random, SeedableRng};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
 use std::{fs, io};
+use rand::prelude::{IndexedRandom, StdRng};
 
 /// Interface générale pour les policies
 pub trait Policy {
