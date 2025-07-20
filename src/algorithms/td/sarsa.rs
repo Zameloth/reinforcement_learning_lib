@@ -42,7 +42,7 @@ fn run_episode(
     env.reset();
     // état et action initiaux
     let mut s = env.state_id();
-    let mut actions = env.available_actions();
+    let actions = env.available_actions();
     let mut a = choose_action(q, s, &actions, epsilon);
 
     while !env.is_game_over() {

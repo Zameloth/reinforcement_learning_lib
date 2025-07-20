@@ -1,7 +1,6 @@
-use std::collections::HashMap;
 use rand::prelude::IndexedRandom;
 use rand::Rng;
-use rand::seq::SliceRandom;
+use std::collections::HashMap;
 
 use crate::core::envs::MonteCarloEnvironment;
 use crate::core::policies::DeterministicPolicy;
@@ -16,9 +15,9 @@ pub fn choose_action(
     actions: &[Action],
     epsilon: f64,
 ) -> Action {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
-    if rng.gen::<f64>() < epsilon {
+    if rng.random::<f64>() < epsilon {
         // Exploration : choisir une action au hasard
         *actions.choose(&mut rng).unwrap()
     } else {
@@ -59,9 +58,5 @@ pub fn build_policy(
         })
         .collect();
 
-    DeterministicPolicy {
-        policy_table,
-        num_states: env.num_states(),
-        num_actions: env.num_actions(),
-    }
+    DeterministicPolicy::from_vec(env, policy_table)
 }

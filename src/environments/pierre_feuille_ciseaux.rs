@@ -65,7 +65,6 @@ pub struct PierreFeuilleCiseaux {
     last_action: usize,
     adv_action: usize,
     score: f64,
-    state: usize,
 }
 
 impl Environment for PierreFeuilleCiseaux {
@@ -88,7 +87,6 @@ impl PierreFeuilleCiseaux {
             last_action: 0,
             adv_action: 0,
             score: 0.0,
-            state: 0,
         };
         
         env.reset();

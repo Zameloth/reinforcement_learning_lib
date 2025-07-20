@@ -1,10 +1,9 @@
-use crate::core::envs::{DynamicProgramingEnvironment, Environment};
+use crate::core::envs::Environment;
 use rand;
 use rand::random;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter};
-use std::io::Write;
 use std::{fs, io};
 
 /// Interface générale pour les policies
@@ -33,9 +32,17 @@ impl Display for DeterministicPolicy {
 }
 
 impl DeterministicPolicy {
-    pub fn new_det_pol(env: &dyn DynamicProgramingEnvironment) -> Self {
+    pub fn new_det_pol(env: &dyn Environment) -> Self {
         Self {
             policy_table: vec![rand::random_range(0..env.num_actions()); env.num_states()],
+            num_states: env.num_states(),
+            num_actions: env.num_actions(),
+        }
+    }
+
+    pub fn from_vec(env: &dyn Environment, table: Vec<usize>) -> Self {
+        Self {
+            policy_table: table,
             num_states: env.num_states(),
             num_actions: env.num_actions(),
         }
@@ -98,13 +105,13 @@ impl Policy for ProbabilisticPolicy {
     }
 }
 
-fn save_to_file<T: Serialize>(obj: &T, path: &str) -> io::Result<()> {
+pub fn save_to_file<T: Serialize>(obj: &T, path: &str) -> io::Result<()> {
     let json =
         serde_json::to_string_pretty(obj).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
     fs::write(path, json)
 }
 
-fn load_from_file<T: DeserializeOwned>(path: &str) -> io::Result<T> {
+pub fn load_from_file<T: DeserializeOwned>(path: &str) -> io::Result<T> {
     let json = fs::read_to_string(path)?;
     let obj = serde_json::from_str(&json).map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
     Ok(obj)

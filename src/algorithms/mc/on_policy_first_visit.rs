@@ -1,5 +1,5 @@
 use crate::core::envs::MonteCarloEnvironment;
-use crate::core::policies::{DeterministicPolicy, Policy};
+use crate::core::policies::DeterministicPolicy;
 use rand::prelude::IndexedRandom;
 use rand::{rng, Rng};
 
@@ -13,7 +13,7 @@ pub fn on_policy_first_visit_mc_control(
     let num_actions = env.num_actions();
     let mut q = vec![vec![0.0; num_actions]; num_states];
     let mut returns_count = vec![vec![0; num_actions]; num_states];
-    let mut policy = DeterministicPolicy::new_det_pol_mc(env);
+    let mut policy = DeterministicPolicy::new_det_pol(env);
 
     let mut rng = rng();
 

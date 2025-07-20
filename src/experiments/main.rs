@@ -1,8 +1,9 @@
-use reinforcement_learning_lib::algorithms::planning::{dyna_q::dyna_q, dyna_q_plus::dyna_q_plus};
-use reinforcement_learning_lib::algorithms::td::{sarsa::sarsa, q_learning::q_learning, expected_sarsa::expected_sarsa};
-use reinforcement_learning_lib::environments::line_world::{LineWorld, line_world_dp};
-use reinforcement_learning_lib::core::envs::{MonteCarloEnvironment, DynamicProgramingEnvironment};
 use reinforcement_learning_lib::algorithms::dp::policy_iteration::policy_iteration;
+use reinforcement_learning_lib::algorithms::planning::{dyna_q::dyna_q, dyna_q_plus::dyna_q_plus};
+use reinforcement_learning_lib::algorithms::td::{
+    expected_sarsa::expected_sarsa, q_learning::q_learning, sarsa::sarsa,
+};
+use reinforcement_learning_lib::environments::line_world::{line_world_dp, LineWorld};
 
 use std::io::{self, Write};
 
@@ -45,19 +46,19 @@ fn main() {
         }
         3 => {
             println!("=== SARSA ===");
-            let mut env =  LineWorld::new();
+            let mut env = LineWorld::new();
             let policy = sarsa(&mut env, alpha, gamma, epsilon, episodes);
             println!("{}", policy);
         }
         4 => {
             println!("=== Q-Learning ===");
-            let mut env =  LineWorld::new();
+            let mut env = LineWorld::new();
             let policy = q_learning(&mut env, alpha, gamma, epsilon, episodes);
             println!("{}", policy);
         }
         5 => {
             println!("=== Expected SARSA ===");
-            let mut env =  LineWorld::new();
+            let mut env = LineWorld::new();
             let policy = expected_sarsa(&mut env, alpha, gamma, epsilon, episodes);
             println!("{}", policy);
         }
@@ -75,7 +76,7 @@ fn main() {
 fn test_policy_iteration() {
     let env = line_world_dp();
 
-    let (policy, _) = policy_iteration(&env, 0.0001, 0.99);
+    let (policy, _) = policy_iteration(&env, 0.0001, 0.99, 1000);
     let expected = vec![0, 1, 1, 1, 0];
 
     for s in 0..3 {

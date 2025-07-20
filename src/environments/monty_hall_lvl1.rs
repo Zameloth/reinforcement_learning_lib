@@ -1,7 +1,7 @@
 use crate::core::envs::{
     DPEnvironment, DynamicProgramingEnvironment, Environment, MonteCarloEnvironment,
 };
-use rand::{random_iter, random_range};
+use rand::random_range;
 
 ///## Actions:
 ///* Porte 1
@@ -58,7 +58,7 @@ pub fn monty_hall_lvl1_dp() -> DPEnvironment {
 //
 // }
 
-struct MontyHallEnv {
+pub struct MontyHallEnv {
     nb_porte: usize,
     porte_choisie: Option<usize>,
     porte_gagnante: usize,
@@ -116,9 +116,10 @@ impl MonteCarloEnvironment for MontyHallEnv {
 
     fn step(&mut self, action: usize) -> (usize, f64) {
         if self.portes_disponibles.contains(&action) && self.nb_porte > 2 {
-            let old_id       = self.state_id;
-            let multiplier   = self.nb_porte;                         // 3 au premier tour
-            let action_index = self.portes_disponibles
+            let old_id = self.state_id;
+            let multiplier = self.nb_porte; // 3 au premier tour
+            let action_index = self
+                .portes_disponibles
                 .iter()
                 .position(|&p| p == action)
                 .unwrap();
@@ -213,7 +214,6 @@ pub fn new_monty_hall(lvl: usize) -> MontyHallEnv {
 mod tests {
     use super::*;
     use crate::core::envs::MonteCarloEnvironment;
-
 
     #[test]
     fn test_reset_initializes_state_id_and_ports() {

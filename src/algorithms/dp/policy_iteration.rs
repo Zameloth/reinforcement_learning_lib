@@ -136,7 +136,7 @@ mod tests {
     fn test_policy_iteration() {
         let env = line_world_dp();
         let expected = vec![0, 1, 1, 1, 0];
-        for i in 0..50{
+        for _ in 0..50{
             let (policy, _) = policy_iteration(&env, 0.0001, 0.99, 1000);
 
 

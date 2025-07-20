@@ -1,7 +1,7 @@
 use crate::core::envs::MonteCarloEnvironment;
-use crate::core::policies::{DeterministicPolicy, Policy};
-use rand::{rng, Rng};
+use crate::core::policies::DeterministicPolicy;
 use rand::prelude::IndexedRandom;
+use rand::{rng, Rng};
 
 pub fn off_policy_mc_control(
     env: &mut dyn MonteCarloEnvironment,
@@ -14,7 +14,7 @@ pub fn off_policy_mc_control(
     let mut q = vec![vec![0.0; num_actions]; num_states];
     let mut c = vec![vec![0.0; num_actions]; num_states];
 
-    let mut policy = DeterministicPolicy::new_det_pol_mc(env);
+    let mut policy = DeterministicPolicy::new_det_pol(env);
 
     let mut rng = rng();
 
@@ -58,10 +58,8 @@ pub fn off_policy_mc_control(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::envs::{Environment, MonteCarloEnvironment};
-    use crate::core::policies::Policy;
+    use crate::core::envs::Environment;
     use crate::environments::line_world::LineWorld;
-
 
     #[test]
     fn test_off_policy_mc_control_learns() {
@@ -71,9 +69,10 @@ mod tests {
 
         // Export CSV
         use std::fs::File;
-        use std::io::{Write, BufWriter};
+        use std::io::{BufWriter, Write};
 
-        let mut file = BufWriter::new(File::create("src/algorithms/mc/q_values_off_policy.csv").unwrap());
+        let mut file =
+            BufWriter::new(File::create("src/algorithms/mc/q_values_off_policy.csv").unwrap());
 
         for (s, actions) in q.iter().enumerate() {
             for (a, &q_val) in actions.iter().enumerate() {
@@ -83,12 +82,13 @@ mod tests {
 
         assert_eq!(policy.policy_table.len(), env.num_states()); //
 
-
         for s in 0..env.num_states() {
             let a = policy.get_action(&s);
             assert!(
                 a < env.num_actions(),
-                "Action hors borne à l'état {}: {}", s, a
+                "Action hors borne à l'état {}: {}",
+                s,
+                a
             );
         }
 

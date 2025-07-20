@@ -1,7 +1,6 @@
 use crate::algorithms::planning::helpers::{build_policy, choose_action};
 use crate::core::envs::MonteCarloEnvironment;
 use crate::core::policies::DeterministicPolicy;
-
 use rand::seq::IteratorRandom;
 use std::collections::HashMap;
 
@@ -20,16 +19,25 @@ pub fn dyna_q(
 ) -> DeterministicPolicy {
     let mut q = QTable::new();
     let mut model = Model::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     for ep in 1..=episodes {
         println!("=== Épisode {} ===", ep);
-        run_episode(env, &mut q, &mut model, alpha, gamma, epsilon, planning_steps, &mut rng);
+        run_episode(
+            env,
+            &mut q,
+            &mut model,
+            alpha,
+            gamma,
+            epsilon,
+            planning_steps,
+            &mut rng,
+        );
     }
 
     // Extraire états/actions rencontrés pour construire la policy
-    let states:Vec<usize>= q.keys().map(|&(s, _)| s).collect();
-    let actions:Vec<usize> = q.keys().map(|&(_, a)| a).collect();
+    let states: Vec<usize> = q.keys().map(|&(s, _)| s).collect();
+    let actions: Vec<usize> = q.keys().map(|&(_, a)| a).collect();
     build_policy(&q, &states, &actions, env)
 }
 
@@ -74,7 +82,8 @@ fn update_q(
 ) {
     let q_sa = *q.get(&(s, a)).unwrap_or(&0.0);
     // max_{a'} Q(s_next, a'): on filtre q par état, on extrait les valeurs, puis on prend le max
-    let max_q_next = q.iter()
+    let max_q_next = q
+        .iter()
         .filter(|&(&(s2, _), _)| s2 == s_next)
         .map(|(_, &v)| v)
         .fold(0.0, f64::max);
@@ -84,13 +93,7 @@ fn update_q(
 }
 
 /// Simule une transition passée tirée au hasard du modèle
-fn planning_step<R: rand::Rng>(
-    q: &mut QTable,
-    model: &Model,
-    gamma: f64,
-    alpha: f64,
-    rng: &mut R,
-) {
+fn planning_step<R: rand::Rng>(q: &mut QTable, model: &Model, gamma: f64, alpha: f64, rng: &mut R) {
     let (&(s, a), &(r, s_next)) = model.iter().choose(rng).unwrap();
     update_q(q, s, a, r, s_next, gamma, alpha);
 }
