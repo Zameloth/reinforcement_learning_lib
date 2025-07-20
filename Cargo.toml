@@ -15,10 +15,166 @@ path = "src/experiments/main.rs"
 name = "run_policy"
 path = "src/experiments/test_exp.rs"
 
-[[bin]]
-name = "lw_policy_it"
-path = "src/experiments/line_world/policy_iteration.rs"
 
+######################### Line world ########################################
+
+[[bin]]
+name = "lw_pol_it"
+path = "src/experiments/line_world/pol_it.rs"
+
+[[bin]]
+name = "lw_dynaq"
+path = "src/experiments/line_world/dyna_q.rs"
+
+[[bin]]
+name = "lw_dynaq+"
+path = "src/experiments/line_world/dyna_q_plus.rs"
+
+[[bin]]
+name = "lw_sarsa"
+path = "src/experiments/line_world/sarsa.rs"
+
+[[bin]]
+name = "lw_sarsa"
+path = "src/experiments/line_world/exp_sarsa.rs"
+
+[[bin]]
+name = "lw_mc_es"
+path = "src/experiments/line_world/mc_es.rs"
+
+[[bin]]
+name = "lw_mc_off"
+path = "src/experiments/line_world/off_pol.rs"
+
+[[bin]]
+name = "lw_mc_on"
+path = "src/experiments/line_world/on_pol.rs"
+
+
+[[bin]]
+name = "lw_q_learning"
+path = "src/experiments/line_world/q_learning.rs"
+
+
+
+######################### Grid world ########################################
+
+[[bin]]
+name = "gw_pol_it"
+path = "src/experiments/grid_world/pol_it.rs"
+
+[[bin]]
+name = "gw_dynaq"
+path = "src/experiments/grid_world/dyna_q.rs"
+
+[[bin]]
+name = "gw_dynaq+"
+path = "src/experiments/grid_world/dyna_q_plus.rs"
+
+[[bin]]
+name = "gw_sarsa"
+path = "src/experiments/grid_world/sarsa.rs"
+
+[[bin]]
+name = "gw_sarsa"
+path = "src/experiments/grid_world/exp_sarsa.rs"
+
+[[bin]]
+name = "gw_mc_es"
+path = "src/experiments/grid_world/mc_es.rs"
+
+[[bin]]
+name = "gw_mc_off"
+path = "src/experiments/grid_world/off_pol.rs"
+
+[[bin]]
+name = "gw_mc_on"
+path = "src/experiments/grid_world/on_pol.rs"
+
+
+[[bin]]
+name = "gw_q_learning"
+path = "src/experiments/grid_world/q_learning.rs"
+
+
+######################### Monty Hall Level 1 ########################################
+
+[[bin]]
+name = "mh_pol_it"
+path = "src/experiments/monty_hall_lvl1/pol_it.rs"
+
+[[bin]]
+name = "mh_dynaq"
+path = "src/experiments/monty_hall_lvl1/dyna_q.rs"
+
+[[bin]]
+name = "mh_dynaq+"
+path = "src/experiments/monty_hall_lvl1/dyna_q_plus.rs"
+
+[[bin]]
+name = "mh_sarsa"
+path = "src/experiments/monty_hall_lvl1/sarsa.rs"
+
+[[bin]]
+name = "mh_sarsa"
+path = "src/experiments/monty_hall_lvl1/exp_sarsa.rs"
+
+[[bin]]
+name = "mh_mc_es"
+path = "src/experiments/monty_hall_lvl1/mc_es.rs"
+
+[[bin]]
+name = "mh_mc_off"
+path = "src/experiments/monty_hall_lvl1/off_pol.rs"
+
+[[bin]]
+name = "mh_mc_on"
+path = "src/experiments/monty_hall_lvl1/on_pol.rs"
+
+
+[[bin]]
+name = "mh_q_learning"
+path = "src/experiments/monty_hall_lvl1/q_learning.rs"
+
+
+######################### Pierre Feuille Ciseaux ########################################
+
+[[bin]]
+name = "pfc_pol_it"
+path = "src/experiments/pierre_feuille_ciseaux/pol_it.rs"
+
+[[bin]]
+name = "pfc_dynaq"
+path = "src/experiments/pierre_feuille_ciseaux/dyna_q.rs"
+
+[[bin]]
+name = "pfc_dynaq+"
+path = "src/experiments/pierre_feuille_ciseaux/dyna_q_plus.rs"
+
+[[bin]]
+name = "pfc_sarsa"
+path = "src/experiments/pierre_feuille_ciseaux/sarsa.rs"
+
+[[bin]]
+name = "pfc_sarsa"
+path = "src/experiments/pierre_feuille_ciseaux/exp_sarsa.rs"
+
+[[bin]]
+name = "pfc_mc_es"
+path = "src/experiments/pierre_feuille_ciseaux/mc_es.rs"
+
+[[bin]]
+name = "pfc_mc_off"
+path = "src/experiments/pierre_feuille_ciseaux/off_pol.rs"
+
+[[bin]]
+name = "pfc_mc_on"
+path = "src/experiments/pierre_feuille_ciseaux/on_pol.rs"
+
+
+[[bin]]
+name = "pfc_q_learning"
+path = "src/experiments/pierre_feuille_ciseaux/q_learning.rs"
 
 ######################### Secret env 0 ########################################
 [[bin]]
