@@ -15,7 +15,6 @@ path = "src/experiments/main.rs"
 name = "run_policy"
 path = "src/experiments/test_exp.rs"
 
-
 ######################### Line world ########################################
 
 [[bin]]
@@ -54,8 +53,6 @@ path = "src/experiments/line_world/on_pol.rs"
 [[bin]]
 name = "lw_q_learning"
 path = "src/experiments/line_world/q_learning.rs"
-
-
 
 ######################### Grid world ########################################
 
@@ -96,7 +93,6 @@ path = "src/experiments/grid_world/on_pol.rs"
 name = "gw_q_learning"
 path = "src/experiments/grid_world/q_learning.rs"
 
-
 ######################### Monty Hall Level 1 ########################################
 
 [[bin]]
@@ -135,7 +131,6 @@ path = "src/experiments/monty_hall_lvl1/on_pol.rs"
 [[bin]]
 name = "mh_q_learning"
 path = "src/experiments/monty_hall_lvl1/q_learning.rs"
-
 
 ######################### Pierre Feuille Ciseaux ########################################
 
@@ -177,6 +172,7 @@ name = "pfc_q_learning"
 path = "src/experiments/pierre_feuille_ciseaux/q_learning.rs"
 
 ######################### Secret env 0 ########################################
+
 [[bin]]
 name = "secret_env_0_dynaq"
 path = "src/experiments/secret_env_0/dyna_q.rs"
