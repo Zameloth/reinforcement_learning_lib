@@ -168,6 +168,16 @@ impl MonteCarloEnvironment for GridWorld {
     fn is_forbidden(&self, action: usize) -> bool {
         action >= self.num_actions()
     }
+
+    fn action_name(&self, action: usize) -> String {
+        match action {
+            0 => "Haut".to_string(),
+            1 => "Bas".to_string(),
+            2 => "Gauche".to_string(),
+            3 => "Droite".to_string(),
+            _ => unreachable!(),
+        }
+    }
 }
 
 #[cfg(test)]

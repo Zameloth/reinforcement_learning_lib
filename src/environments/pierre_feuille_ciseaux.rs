@@ -213,4 +213,13 @@ impl MonteCarloEnvironment for PierreFeuilleCiseaux {
     fn is_forbidden(&self, action: usize) -> bool {
         action >= self.num_actions()
     }
+
+    fn action_name(&self, action: usize) -> String {
+        match action {
+            0 => "pierre".to_string(),
+            1 => "feuille".to_string(),
+            2 => "ciseau".to_string(),
+            _ => unreachable!(),
+        }
+    }
 }

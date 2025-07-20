@@ -13,7 +13,11 @@ path = "src/experiments/main.rs"
 
 [[bin]]
 name = "run_policy"
-path = "src/experiments/test_exp.rs"
+path = "src/experiments/run_policy.rs"
+
+[[bin]]
+name = "run_manual"
+path = "src/experiments/run_manual.rs"
 
 ######################### Line world ########################################
 

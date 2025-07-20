@@ -28,15 +28,37 @@ pub fn run_policy(env: &mut dyn MonteCarloEnvironment, policy: &dyn Policy) {
     println!("Fin du jeu");
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::algorithms::dp::value_iteration::value_iteration;
-    use crate::environments::line_world::line_world_dp;
-    use crate::environments::line_world::LineWorld;
+/// Permet à l'utilisateur de choisir les actions manuellement dans un environnement Monte Carlo
+pub fn run_manual(env: &mut dyn MonteCarloEnvironment) {
+    env.reset();
+    env.display();
 
-    #[test]
-    fn test_run_policy() {
+    while !env.is_game_over() {
+        println!("Actions disponibles :");
+        let actions = env.available_actions();
+        for &action in &actions {
+            println!("  - Action {} : {:?}", action, env.action_name(action));
+        }
 
+        // Demander à l'utilisateur de choisir une action
+        let chosen_action = loop {
+            print!("Entrez le numéro de l'action : ");
+            io::stdout().flush().unwrap();
+
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).unwrap();
+
+            match input.trim().parse::<usize>() {
+                Ok(a) if actions.contains(&a) => break a,
+                _ => println!("Action invalide, réessayez."),
+            }
+        };
+
+        env.step(chosen_action);
+        let reward = env.score();
+        println!("Récompense reçue : {}", reward);
+        env.display();
     }
+
+    println!("Fin du jeu.");
 }

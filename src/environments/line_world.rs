@@ -79,6 +79,14 @@ impl envs::MonteCarloEnvironment for LineWorld {
     fn is_forbidden(&self, action: usize) -> bool {
         action >= self.num_actions()
     }
+
+    fn action_name(&self, action: usize) -> String {
+        match action {
+            0 => "left".to_string(),
+            1 => "right".to_string(),
+            _ => unreachable!(),
+        }
+    }
 }
 
 pub fn line_world_dp() -> DPEnvironment {

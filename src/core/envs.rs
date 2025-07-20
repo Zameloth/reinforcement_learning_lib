@@ -16,7 +16,9 @@ pub trait MonteCarloEnvironment: Environment {
     fn start_from_random_state(&mut self);
     fn state_id(&self) -> usize;
     fn is_forbidden(&self, action: usize) -> bool;
-    //fn render(&self);
+    fn action_name(&self, action: usize) -> String {
+        String::from("")
+    }
 }
 
 pub trait DynamicProgramingEnvironment: Environment {
