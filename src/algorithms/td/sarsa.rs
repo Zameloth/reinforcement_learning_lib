@@ -1,4 +1,4 @@
-use crate::algorithms::planning::helpers::{choose_action, build_policy};
+use crate::algorithms::planning::helpers::{build_policy, choose_action};
 use crate::core::envs::MonteCarloEnvironment;
 use crate::core::policies::DeterministicPolicy;
 
@@ -18,9 +18,9 @@ pub fn sarsa(
     episodes: usize,
 ) -> (DeterministicPolicy, Vec<f64>) {
     // États et actions globaux pour la construction de la policy
-    let all_states  = (0..env.num_states()).collect::<Vec<_>>();
+    let all_states = (0..env.num_states()).collect::<Vec<_>>();
     env.reset();
-    let all_actions = env.available_actions();
+    let all_actions = (0..env.num_actions()).collect::<Vec<_>>();
 
     let mut q: QTable = HashMap::new();
     let mut rewards_per_episode = Vec::with_capacity(episodes);
@@ -28,7 +28,8 @@ pub fn sarsa(
     for ep in 1..=episodes {
         if ep % 100 == 0 {
             println!("=== Épisode {} ===", ep);
-        }        let total_reward = run_episode(env, &mut q, alpha, gamma, epsilon);
+        }
+        let total_reward = run_episode(env, &mut q, alpha, gamma, epsilon);
         rewards_per_episode.push(total_reward);
     }
 
@@ -84,20 +85,14 @@ fn update_q(
     gamma: f64,
     alpha: f64,
 ) {
-    let q_sa   = *q.get(&(s, a)).unwrap_or(&0.0);
+    let q_sa = *q.get(&(s, a)).unwrap_or(&0.0);
     let q_next = *q.get(&(s_next, a_next)).unwrap_or(&0.0);
     let new_q = q_sa + alpha * (reward + gamma * q_next - q_sa);
     q.insert((s, a), new_q);
 }
 
 /// Si s' est terminal, Q(s,a) += α [r − Q(s,a)]
-fn update_terminal(
-    q: &mut QTable,
-    s: State,
-    a: Action,
-    reward: f64,
-    alpha: f64,
-) {
+fn update_terminal(q: &mut QTable, s: State, a: Action, reward: f64, alpha: f64) {
     let q_sa = *q.get(&(s, a)).unwrap_or(&0.0);
     let new_q = q_sa + alpha * (reward - q_sa);
     q.insert((s, a), new_q);

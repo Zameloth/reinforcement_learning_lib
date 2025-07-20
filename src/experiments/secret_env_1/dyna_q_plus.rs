@@ -9,7 +9,7 @@ fn main() {
         gamma: 0.99,
         theta: 1e-4,
         kappa: 0.001,
-        max_iter: 1_000_000,
+        max_iter: 100_000,
         planning_steps: 10,
         output_dir: "output/secret_env_1/dyna_q_plus/".into(),
     };
