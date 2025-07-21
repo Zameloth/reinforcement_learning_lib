@@ -92,7 +92,7 @@ fn evaluate_policy(
                 *env.available_actions().choose(&mut rng).unwrap()
             };
             let (_s_next, r) = env.step(a);
-            g += r * gamma.powi(t);
+            g += r;
             t += 1;
             if env.is_game_over() {
                 break;
