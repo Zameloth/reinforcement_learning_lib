@@ -143,6 +143,10 @@ name = "pfc_pol_it"
 path = "src/experiments/pierre_feuille_ciseaux/pol_it.rs"
 
 [[bin]]
+name = "pfc_value_it"
+path = "src/experiments/pierre_feuille_ciseaux/value_it.rs"
+
+[[bin]]
 name = "pfc_dynaq"
 path = "src/experiments/pierre_feuille_ciseaux/dyna_q.rs"
 

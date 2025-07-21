@@ -109,7 +109,7 @@ pub fn run_experiment(cfg: &Config) {
     let mut env_dp: Box<dyn DynamicProgramingEnvironment> = match cfg.env_name.as_str() {
         "line_world" => Box::new(line_world_dp()),
         "grid_world" => Box::new(grid_world()),
-        "pfs" => Box::new(pierre_feuille_ciseaux_dp()),
+        "pierre_feuille_ciseaux" => Box::new(pierre_feuille_ciseaux_dp()),
         "secret_0" => Box::new(SecretEnv::new(0).unwrap()),
         "secret_1" => Box::new(SecretEnv::new(1).unwrap()),
         "secret_2" => Box::new(SecretEnv::new(2).unwrap()),
@@ -118,7 +118,7 @@ pub fn run_experiment(cfg: &Config) {
     let mut env_mc: Box<dyn MonteCarloEnvironment> = match cfg.env_name.as_str() {
         "line_world" => Box::new(LineWorld::new()),
         "grid_world" => Box::new(GridWorld::new()),
-        "pfs" => Box::new(PierreFeuilleCiseaux::new()),
+        "pierre_feuille_ciseaux" => Box::new(PierreFeuilleCiseaux::new()),
         "secret_0" => Box::new(SecretEnv::new(0).unwrap()),
         "secret_1" => Box::new(SecretEnv::new(1).unwrap()),
         "secret_2" => Box::new(SecretEnv::new(2).unwrap()),
